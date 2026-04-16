@@ -71,7 +71,7 @@ No install, no server, no build step:
 
 ```bash
 # Clone the repo
-git clone https://github.com/your-org/wavr-pro.git
+git clone http://github.com/oliego-ai/WavrPro
 cd wavr-pro
 
 # No npm install needed — WavrPro.jsx has zero runtime dependencies
@@ -111,22 +111,26 @@ See `CONTRIBUTING.md` for the full integration guide and `plugin-sdk/README.md` 
 ## Feature overview
 
 ### Timeline
+
 - Unlimited tracks with drag-and-drop audio clips
 - Drag to move clips, resize from the right edge, right-click for context menu
 - Click the ruler or drag the playhead to seek anywhere
 - Mute, Solo, Arm, and per-track volume controls
 
 ### Mixing
+
 - **6-band parametric EQ per track** — SUB (lowshelf 60Hz), BASS (200Hz), LO-MID (600Hz), MID (1800Hz), HI-MID (5000Hz), AIR (highshelf 12kHz)
 - **Five visualizer modes** — waveform, spectrum, spectrogram, oscilloscope, VU meter
 - Master gain with clipping protection
 
 ### Transport
+
 - Play, pause in place, stop, rewind
 - Drag the playhead to any position — audio restarts from that beat
 - Space bar to play/pause, Home to rewind
 
 ### Session & Export
+
 - Named sessions stored in IndexedDB — survive browser refresh
 - Autosave every 60 seconds
 - 40-step undo/redo history with labeled action names
@@ -134,10 +138,13 @@ See `CONTRIBUTING.md` for the full integration guide and `plugin-sdk/README.md` 
 - Full mix WAV export — 44.1kHz 16-bit stereo via `OfflineAudioContext`
 
 ### Templates
+
 Six synthesized starter sessions (no audio files needed):
+
 - Blank, Lo-Fi Hip Hop (87 BPM, swing), Techno (138 BPM), Ambient (70 BPM), Pop (120 BPM), Podcast/VO
 
 ### Plugin system
+
 - Register any `WavrPlugin` subclass with one line
 - Automatically gets topbar button, modal/drawer chrome, BPM sync, and session state
 - `PluginShell.jsx` is a generic wrapper that works for every plugin
@@ -147,20 +154,20 @@ Six synthesized starter sessions (no audio files needed):
 
 ## Browser compatibility
 
-| Browser | Status |
-|---|---|
-| Chrome 90+ | ✅ Full support |
+| Browser     | Status          |
+| ----------- | --------------- |
+| Chrome 90+  | ✅ Full support |
 | Firefox 88+ | ✅ Full support |
-| Safari 15+ | ✅ Full support |
-| Edge 90+ | ✅ Full support |
+| Safari 15+  | ✅ Full support |
+| Edge 90+    | ✅ Full support |
 
 ### Known limitations
 
-| Limitation | Why |
-|---|---|
-| No native VST/AU | Web platform only. Plugins are JS classes, not binaries. |
-| No MIDI input (yet) | Web MIDI API not yet integrated. |
-| Audio pauses when tab is hidden | Browser AudioContext throttling — unfocused tabs suspend. |
+| Limitation                       | Why                                                                |
+| -------------------------------- | ------------------------------------------------------------------ |
+| No native VST/AU                 | Web platform only. Plugins are JS classes, not binaries.           |
+| No MIDI input (yet)              | Web MIDI API not yet integrated.                                   |
+| Audio pauses when tab is hidden  | Browser AudioContext throttling — unfocused tabs suspend.          |
 | Session storage is browser-local | IndexedDB is per-browser-profile. Use `.wavrproj` export to share. |
 
 ---
@@ -172,6 +179,7 @@ Six synthesized starter sessions (no audio files needed):
 The key principle: anything on the audio timing path (scheduling, gain changes, analyser reads) uses `useRef` and the Web Audio API directly. React `useState` only updates when the UI needs to re-render. This keeps the 60fps audio loop completely independent of React's render cycle.
 
 Key patterns:
+
 - `tracksRef` mirrors `tracks` state for audio callbacks that would otherwise capture stale closures
 - VU meters write directly to DOM via `vuFillsRef` — never via setState
 - `playOffsetRef` and `playStartRef` are refs, not state — the scheduler reads them directly
