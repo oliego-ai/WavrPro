@@ -3,7 +3,7 @@
 > A full-featured digital audio workstation that runs entirely in your browser.  
 > Multi-track timeline · 6-band EQ · Session save · WAV export · VST-style plugin system · Zero install.
 
-**[→ Launch the DAW](docs/wavr-demo.html)** · **[→ Plugin SDK](docs/sdk-index.html)** · **[→ Live Drum Machine Demo](docs/sdk-demo.html)**
+**[→ Launch the DAW](https://oliego-ai.github.io/WavrPro/)** · **[→ Plugin SDK](https://oliego-ai.github.io/WavrPro/sdk-index.html)** · **[→ Live Drum Machine Demo](https://oliego-ai.github.io/WavrPro/sdk-demo.html)**
 
 ---
 
