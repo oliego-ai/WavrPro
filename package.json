@@ -22,9 +22,9 @@
   ],
   "scripts": {
     "start": "python3 -m http.server 8080 --directory public",
-    "dev": "echo 'Open public/wavr-pro.html in your browser — no build step needed.'",
+    "dev": "echo 'Open docs/wavr-pro.html in your browser — no build step needed.'",
     "serve-docs": "python3 -m http.server 8080 --directory docs",
-    "open": "open public/wavr-pro.html || xdg-open public/wavr-pro.html"
+    "open": "open docs/wavr-pro.html || xdg-open docs/wavr-pro.html"
   },
   "peerDependencies": {
     "react": ">=18.0.0",
