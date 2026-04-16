@@ -23,8 +23,6 @@ It ships with a complete recording and mixing workflow, a project template syste
 
 ## SPONSOR: **[→ Oliego.Space](https://oliego.space)** - Create without limits!
 
-<img width="800" height="800" alt="template (16)" src="https://github.com/user-attachments/assets/30794f15-bf3d-4b53-872f-baa2ea098d8d" />
-
 ---
 #Screenshots
 <img width="1847" height="882" alt="Screenshot 2026-04-16 at 11 02 10 AM" src="https://github.com/user-attachments/assets/ae06dc3b-8f19-41c7-87af-bfbdde38db75" />
@@ -35,6 +33,8 @@ It ships with a complete recording and mixing workflow, a project template syste
 ---
 
 ## Repository structure
+
+<img width="400" height="400" alt="template (16)" src="https://github.com/user-attachments/assets/30794f15-bf3d-4b53-872f-baa2ea098d8d" />
 
 ```
 wavr-pro/
