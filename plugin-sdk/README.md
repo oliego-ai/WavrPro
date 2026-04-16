@@ -1,5 +1,10 @@
 # WAVR Plugin SDK
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-ff6b35?style=flat-square)](../../LICENSE)
+[![Zero Dependencies](https://img.shields.io/badge/dependencies-0-52d9a0?style=flat-square&labelColor=0c0c18)](package.json)
+[![Framework Free](https://img.shields.io/badge/framework-free-ff9a6c?style=flat-square&labelColor=0c0c18)]()
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-52d9a0?style=flat-square&labelColor=0c0c18)](../../CONTRIBUTING.md)
+
 Build VST-style audio plugins for **WAVR PRO** — pure JavaScript, zero dependencies, runs entirely in the browser.
 
 ---

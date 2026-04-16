@@ -1,5 +1,12 @@
 # WAVR PRO
 
+[![License: AGPL 3.0](https://img.shields.io/badge/License-MIT-ff6b35?style=flat-square)](LICENSE)
+[![React](https://img.shields.io/badge/React-18%2B-61dafb?style=flat-square&logo=react&logoColor=61dafb&labelColor=0c0c18)](https://react.dev)
+[![Web Audio API](https://img.shields.io/badge/Web_Audio_API-native-52d9a0?style=flat-square&logo=webaudio&logoColor=white&labelColor=0c0c18)](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API)
+[![Node](https://img.shields.io/badge/Node-18%2B-6da55f?style=flat-square&logo=node.js&logoColor=white&labelColor=0c0c18)](https://nodejs.org)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-52d9a0?style=flat-square&labelColor=0c0c18)](CONTRIBUTING.md)
+[![Live Demo](https://img.shields.io/badge/LiveDemo-live-ff6b35?style=flat-square&logo=github&logoColor=white&labelColor=0c0c18)](https://oliego-ai.github.io/WavrPro)
+
 > A full-featured digital audio workstation that runs entirely in your browser.  
 > Multi-track timeline · 6-band EQ · Session save · WAV export · VST-style plugin system · Zero install.
 
