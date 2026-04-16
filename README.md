@@ -23,6 +23,15 @@ It ships with a complete recording and mixing workflow, a project template syste
 
 ## SPONSOR: **[→ Oliego.Space](https://oliego.space)** - Create without limits!
 
+<img width="2160" height="2160" alt="template (16)" src="https://github.com/user-attachments/assets/30794f15-bf3d-4b53-872f-baa2ea098d8d" />
+
+---
+#Screenshots
+<img width="1844" height="922" alt="Screenshot 2026-04-16 at 11 01 35 AM" src="https://github.com/user-attachments/assets/dbeed226-2cbd-486c-a45e-18d5ee5e482a" />
+<img width="1847" height="882" alt="Screenshot 2026-04-16 at 11 02 10 AM" src="https://github.com/user-attachments/assets/ae06dc3b-8f19-41c7-87af-bfbdde38db75" />
+<img width="1848" height="969" alt="Screenshot 2026-04-16 at 11 02 22 AM" src="https://github.com/user-attachments/assets/1b599379-0d49-4eba-901e-a92e71b04f25" />
+<img width="1845" height="967" alt="Screenshot 2026-04-16 at 11 02 31 AM" src="https://github.com/user-attachments/assets/5c6d69d7-251d-4b53-9cc3-af1dfd5adcef" />
+
 ---
 
 ## Repository structure
