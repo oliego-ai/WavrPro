@@ -224,4 +224,4 @@ See `CONTRIBUTING.md` for the full guide. Short version:
 
 ## Licence
 
-MIT — use freely in open-source and commercial projects.
+APGPL — use freely in open-source and commercial projects.
