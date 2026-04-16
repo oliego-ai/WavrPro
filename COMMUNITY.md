@@ -241,7 +241,7 @@ Plugins that include a test page and a clear description get reviewed faster.
 
 ## Licence
 
-MIT — you own your plugin code. Build freely, ship commercially, contribute back if you want to.
+AGPL 3.0 — you own your plugin code. Build freely, ship commercially, contribute back if you want to.
 
 ---
 
