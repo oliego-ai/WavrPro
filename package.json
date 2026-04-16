@@ -1,0 +1,51 @@
+{
+  "name": "wavr-pro",
+  "version": "1.0.0",
+  "author": {
+    "name": "Emmanuel Ibe II",
+    "email": "hello@oliego.com"
+  },
+  "description": "A full-featured browser DAW built on React and the Web Audio API",
+  "private": true,
+  "keywords": [
+    "daw",
+    "audio",
+    "web-audio",
+    "react",
+    "browser-daw",
+    "music-production",
+    "plugin-system"
+  ],
+  "license": "MIT",
+  "workspaces": [
+    "plugin-sdk"
+  ],
+  "scripts": {
+    "start": "python3 -m http.server 8080 --directory public",
+    "dev": "echo 'Open public/wavr-pro.html in your browser — no build step needed.'",
+    "serve-docs": "python3 -m http.server 8080 --directory docs",
+    "open": "open public/wavr-pro.html || xdg-open public/wavr-pro.html"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
+  },
+  "devDependencies": {},
+  "dependencies": {},
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/oliego-ai/wavr-pro.git"
+  },
+  "homepage": "https://oliego.github.io/wavr-pro"
+}

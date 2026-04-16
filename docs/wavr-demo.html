@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>WAVR PRO — Live Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=JetBrains+Mono:wght@300;400;600&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#06060d;--sf:#0c0c18;--sf2:#111120;
+  --tx:#eeeaf8;--mt:#6a6480;--dim:#2e2a40;
+  --ac:#ff6b35;--ac2:#ff9a6c;--ac3:#ffd166;
+  --gn:#52d9a0;--br:rgba(255,107,53,.1);--br2:rgba(255,107,53,.2);
+}
+html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'JetBrains Mono',monospace;font-size:12px;-webkit-font-smoothing:antialiased;overflow:hidden;}
+
+#shell{display:flex;flex-direction:column;height:100vh;}
+
+/* TOPBAR */
+#topbar{height:44px;flex-shrink:0;display:flex;align-items:center;gap:8px;
+  padding:0 16px;background:rgba(6,6,13,.95);
+  border-bottom:1px solid var(--br2);}
+.tb-logo{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;
+  letter-spacing:3px;color:var(--ac);text-decoration:none;margin-right:4px;}
+.tb-sep{width:1px;height:18px;background:var(--br2);margin:0 4px;}
+.tb-btn{padding:4px 11px;border-radius:4px;border:1px solid var(--br2);
+  background:transparent;color:var(--mt);font-family:inherit;font-size:10px;
+  cursor:pointer;text-decoration:none;transition:all .12s;white-space:nowrap;
+  display:inline-flex;align-items:center;gap:5px;}
+.tb-btn:hover{color:var(--tx);border-color:var(--ac);background:rgba(255,107,53,.06);}
+.tb-btn.accent{background:var(--ac);border-color:var(--ac);color:#fff;}
+.tb-btn.accent:hover{opacity:.82;}
+#topbar .spacer{flex:1;}
+.tb-notice{font-size:9px;color:var(--mt);letter-spacing:.5px;
+  background:rgba(255,209,102,.06);border:1px solid rgba(255,209,102,.15);
+  padding:3px 10px;border-radius:3px;}
+.tb-notice strong{color:var(--ac3);}
+
+/* BODY */
+#body{flex:1;display:flex;min-height:0;}
+
+/* DAW FRAME */
+#daw-area{flex:1;position:relative;min-width:0;
+  display:flex;flex-direction:column;background:var(--bg);}
+#daw-frame{flex:1;width:100%;border:none;display:block;background:var(--bg);}
+.launch-screen{flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:20px;padding:40px;text-align:center;}
+.launch-icon{font-size:48px;color:var(--ac);opacity:.3;}
+.launch-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;
+  letter-spacing:-1px;color:var(--tx);}
+.launch-sub{font-size:12px;color:var(--mt);max-width:400px;line-height:1.8;}
+.launch-btn{padding:12px 28px;background:var(--ac);color:#fff;border:none;
+  border-radius:6px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;
+  letter-spacing:1.5px;cursor:pointer;transition:opacity .15s;}
+.launch-btn:hover{opacity:.82;}
+
+/* SIDEBAR */
+#sidebar{width:256px;flex-shrink:0;background:var(--sf);
+  border-left:1px solid var(--br2);display:flex;flex-direction:column;
+  overflow:hidden;}
+.sb-header{padding:12px 14px;border-bottom:1px solid var(--br2);flex-shrink:0;}
+.sb-logo{font-family:'Syne',sans-serif;font-size:11px;font-weight:800;
+  letter-spacing:2px;color:var(--ac);}
+.sb-tagline{font-size:9px;color:var(--mt);margin-top:2px;}
+
+/* SIDEBAR TABS */
+.sb-tabs{display:flex;border-bottom:1px solid var(--br2);flex-shrink:0;}
+.sb-tab{flex:1;padding:7px 4px;font-size:8px;letter-spacing:1px;color:var(--mt);
+  cursor:pointer;text-align:center;border:none;background:transparent;
+  font-family:inherit;transition:color .1s;border-bottom:2px solid transparent;}
+.sb-tab.on{color:var(--tx);border-bottom-color:var(--ac);}
+.sb-tab:hover:not(.on){color:var(--tx);background:rgba(255,255,255,.03);}
+
+.sb-pane{display:none;flex:1;flex-direction:column;overflow-y:auto;min-height:0;}
+.sb-pane.on{display:flex;}
+.sb-pane::-webkit-scrollbar{width:3px;}
+.sb-pane::-webkit-scrollbar-thumb{background:var(--sf2);}
+
+.sb-section{padding:12px 14px;border-bottom:1px solid var(--br);}
+.sb-section-title{font-size:8px;letter-spacing:1.5px;color:var(--mt);margin-bottom:8px;}
+
+/* FEATURE LIST */
+.feat-list{display:flex;flex-direction:column;gap:6px;}
+.feat-item{display:flex;align-items:flex-start;gap:8px;font-size:10px;
+  color:var(--mt);line-height:1.6;}
+.feat-item .feat-dot{color:var(--ac);font-size:10px;flex-shrink:0;margin-top:1px;}
+.feat-item strong{color:var(--tx);font-weight:600;}
+
+/* SHORTCUTS */
+.shortcut-list{display:flex;flex-direction:column;gap:5px;}
+.sc{display:flex;align-items:center;justify-content:space-between;
+  font-size:10px;color:var(--mt);}
+.sc kbd{background:var(--sf2);border:1px solid var(--br2);border-radius:3px;
+  padding:1px 6px;font-family:inherit;font-size:9px;color:var(--tx);}
+
+/* TIPS */
+.tip{background:var(--sf2);border:1px solid var(--br);border-radius:6px;
+  padding:10px 12px;font-size:10px;color:var(--mt);line-height:1.7;
+  margin-bottom:8px;}
+.tip strong{color:var(--ac2);}
+
+/* LINKS */
+.sb-links{padding:12px 14px;display:flex;flex-direction:column;gap:8px;flex-shrink:0;}
+.sb-link{display:flex;align-items:center;gap:8px;
+  padding:8px 10px;background:var(--sf2);border:1px solid var(--br);
+  border-radius:5px;text-decoration:none;color:var(--tx);
+  font-size:10px;transition:border-color .15s;}
+.sb-link:hover{border-color:var(--ac);}
+.sb-link .sl-icon{color:var(--ac);font-size:12px;flex-shrink:0;}
+.sb-link .sl-label{font-weight:600;}
+.sb-link .sl-sub{font-size:9px;color:var(--mt);margin-top:1px;}
+</style>
+</head>
+<body>
+<div id="shell">
+  <div id="topbar">
+    <a href="index.html" class="tb-logo">WAVR</a>
+    <div class="tb-sep"></div>
+    <a href="index.html"     class="tb-btn">← Docs</a>
+    <a href="sdk-index.html" class="tb-btn">Plugin SDK</a>
+    <a href="sdk-demo.html"  class="tb-btn">Drum Machine</a>
+    <div class="spacer"></div>
+    <div class="tb-notice"><strong>Tip:</strong> Audio activates on first Play click</div>
+    <div class="tb-sep"></div>
+    <button class="tb-btn accent" id="launch-btn" onclick="launchDAW()">▶ Launch DAW</button>
+  </div>
+
+  <div id="body">
+    <div id="daw-area">
+      <div class="launch-screen" id="launch-screen">
+        <div class="launch-icon">◈</div>
+        <div class="launch-title">WAVR PRO</div>
+        <div class="launch-sub">A full-featured browser DAW — multi-track timeline, 6-band EQ, session save, WAV export, and VST-style plugins. Click to launch.</div>
+        <button class="launch-btn" onclick="launchDAW()">▶ Launch WAVR PRO</button>
+      </div>
+      <iframe id="daw-frame" src="" style="display:none;" title="WAVR PRO DAW"></iframe>
+    </div>
+
+    <div id="sidebar">
+      <div class="sb-header">
+        <div class="sb-logo">WAVR PRO</div>
+        <div class="sb-tagline">Browser DAW · Zero install</div>
+      </div>
+      <div class="sb-tabs">
+        <button class="sb-tab on" data-pane="features">Features</button>
+        <button class="sb-tab"    data-pane="shortcuts">Keys</button>
+        <button class="sb-tab"    data-pane="tips">Tips</button>
+        <button class="sb-tab"    data-pane="links">Links</button>
+      </div>
+
+      <div class="sb-pane on" id="pane-features">
+        <div class="sb-section">
+          <div class="sb-section-title">TIMELINE</div>
+          <div class="feat-list">
+            <div class="feat-item"><span class="feat-dot">⬡</span><div>Unlimited tracks — drag audio files directly onto lanes</div></div>
+            <div class="feat-item"><span class="feat-dot">⬡</span><div>Drag, resize, and right-click clips for full clip menu</div></div>
+            <div class="feat-item"><span class="feat-dot">⬡</span><div>Click ruler or drag playhead to seek anywhere</div></div>
+            <div class="feat-item"><span class="feat-dot">⬡</span><div>Mute, Solo, Arm, volume per track</div></div>
+          </div>
+        </div>
+        <div class="sb-section">
+          <div class="sb-section-title">MIXING</div>
+          <div class="feat-list">
+            <div class="feat-item"><span class="feat-dot">⬡</span><div><strong>6-band EQ</strong> per track — SUB, BASS, LO-M, MID, HI-M, AIR</div></div>
+            <div class="feat-item"><span class="feat-dot">⬡</span><div>5 visualizer modes — waveform, spectrum, spectrogram, oscilloscope, VU</div></div>
+            <div class="feat-item"><span class="feat-dot">⬡</span><div>Master volume + track-level gain</div></div>
+          </div>
+        </div>
+        <div class="sb-section">
+          <div class="sb-section-title">SESSION & EXPORT</div>
+          <div class="feat-list">
+            <div class="feat-item"><span class="feat-dot">⬡</span><div>Named session saves to IndexedDB · Autosave every 60s</div></div>
+            <div class="feat-item"><span class="feat-dot">⬡</span><div>Export / import <code style="color:var(--ac2)">.wavrproj</code> for portability</div></div>
+            <div class="feat-item"><span class="feat-dot">⬡</span><div>Offline WAV export — full mix at 44.1kHz 16-bit stereo</div></div>
+            <div class="feat-item"><span class="feat-dot">⬡</span><div>40-step undo / redo history with labeled actions</div></div>
+          </div>
+        </div>
+        <div class="sb-section">
+          <div class="sb-section-title">PLUGINS</div>
+          <div class="feat-list">
+            <div class="feat-item"><span class="feat-dot">⬡</span><div>VST-style plugin system — register any WavrPlugin class</div></div>
+            <div class="feat-item"><span class="feat-dot">⬡</span><div><strong>Drum Machine</strong> — 16/32 steps, 8 synth instruments, swing, presets</div></div>
+            <div class="feat-item"><span class="feat-dot">⬡</span><div>Plugins bounce audio directly to new tracks</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sb-pane" id="pane-shortcuts">
+        <div class="sb-section">
+          <div class="sb-section-title">TRANSPORT</div>
+          <div class="shortcut-list">
+            <div class="sc"><span>Play / Pause</span><kbd>Space</kbd></div>
+            <div class="sc"><span>Rewind to start</span><kbd>Home</kbd></div>
+            <div class="sc"><span>Seek (click ruler)</span><span style="font-size:9px;color:var(--dim)">mouse</span></div>
+            <div class="sc"><span>Drag playhead</span><span style="font-size:9px;color:var(--dim)">drag ↔</span></div>
+          </div>
+        </div>
+        <div class="sb-section">
+          <div class="sb-section-title">EDITING</div>
+          <div class="shortcut-list">
+            <div class="sc"><span>Undo</span><kbd>Ctrl Z</kbd></div>
+            <div class="sc"><span>Redo</span><kbd>Ctrl Y</kbd></div>
+            <div class="sc"><span>Delete clip</span><kbd>Del</kbd></div>
+            <div class="sc"><span>Save session</span><kbd>Ctrl S</kbd></div>
+          </div>
+        </div>
+        <div class="sb-section">
+          <div class="sb-section-title">CLIPS</div>
+          <div class="shortcut-list">
+            <div class="sc"><span>Drag to move</span><span style="font-size:9px;color:var(--dim)">drag clip</span></div>
+            <div class="sc"><span>Resize clip</span><span style="font-size:9px;color:var(--dim)">drag right edge</span></div>
+            <div class="sc"><span>Context menu</span><span style="font-size:9px;color:var(--dim)">right-click clip</span></div>
+            <div class="sc"><span>Drop audio file</span><span style="font-size:9px;color:var(--dim)">OS → lane</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sb-pane" id="pane-tips">
+        <div style="padding:12px 14px;">
+          <div class="tip"><strong>First click</strong> — browser autoplay policy means audio won't start until you interact. Click Play after launching.</div>
+          <div class="tip"><strong>Drop audio</strong> — drag WAV, MP3, OGG, or FLAC files from your file manager directly onto any track lane to import them.</div>
+          <div class="tip"><strong>Drum Machine</strong> — open it from the topbar Plugins button. Hit Bounce to drop a rendered loop onto a new track.</div>
+          <div class="tip"><strong>Save session</strong> — use ◈ Save to name and store your session. Sessions survive browser refresh and are stored in IndexedDB.</div>
+          <div class="tip"><strong>Export .wavrproj</strong> — use the export button to create a portable project file you can share or open on another machine.</div>
+          <div class="tip"><strong>Templates</strong> — click ⊕ New to open the template picker. Six synthesized starters (lo-fi, techno, ambient, pop, podcast, blank) render instantly.</div>
+          <div class="tip"><strong>EQ</strong> — click the EQ button on any track header to open the 6-band equalizer. Changes apply live during playback.</div>
+        </div>
+      </div>
+
+      <div class="sb-pane" id="pane-links">
+        <div class="sb-links">
+          <a href="index.html" class="sb-link">
+            <span class="sl-icon">◈</span>
+            <div><div class="sl-label">WAVR PRO Docs</div><div class="sl-sub">Full feature overview</div></div>
+          </a>
+          <a href="sdk-index.html" class="sb-link">
+            <span class="sl-icon">⬡</span>
+            <div><div class="sl-label">Plugin SDK</div><div class="sl-sub">Build your own plugin</div></div>
+          </a>
+          <a href="sdk-demo.html" class="sb-link">
+            <span class="sl-icon">▶</span>
+            <div><div class="sl-label">Drum Machine Demo</div><div class="sl-sub">Test the plugin standalone</div></div>
+          </a>
+          <a href="https://github.com" class="sb-link">
+            <span class="sl-icon">↓</span>
+            <div><div class="sl-label">GitHub Repository</div><div class="sl-sub">Source, issues, releases</div></div>
+          </a>
+          <a href="https://github.com" class="sb-link">
+            <span class="sl-icon">✦</span>
+            <div><div class="sl-label">COMMUNITY.md</div><div class="sl-sub">How to contribute</div></div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function launchDAW() {
+  const frame = document.getElementById('daw-frame');
+  const screen = document.getElementById('launch-screen');
+  const btn = document.getElementById('launch-btn');
+  frame.src = '../public/wavr-pro.html';
+  frame.style.display = 'block';
+  screen.style.display = 'none';
+  btn.textContent = '◈ DAW Running';
+  btn.style.background = 'var(--gn)';
+  btn.style.borderColor = 'var(--gn)';
+  btn.onclick = null;
+}
+document.querySelectorAll('.sb-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.sb-tab').forEach(t => t.classList.remove('on'));
+    document.querySelectorAll('.sb-pane').forEach(p => p.classList.remove('on'));
+    tab.classList.add('on');
+    document.getElementById('pane-' + tab.dataset.pane).classList.add('on');
+  });
+});
+</script>
+</body>
+</html>

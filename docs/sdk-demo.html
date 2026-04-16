@@ -1,0 +1,1746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>WAVR Plugin SDK — Live Demo</title>
+<meta name="description" content="Try the WAVR Drum Machine plugin live in your browser. No install. No signup."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080810;--sf:#0f0f1a;--sf2:#161624;--sf3:#1e1e30;
+  --warm:#100c09;--warm2:#1a1410;--warm3:#221c17;
+  --tx:#f0e8e2;--mt:#7a6a60;--dim:#3a3228;
+  --ac:#ff6b35;--ac2:#ff9a6c;--ac3:#ffd166;
+  --tl:#00cec9;--gn:#52d9a0;
+  --br:rgba(255,107,53,.1);--br2:rgba(255,107,53,.22);--br3:rgba(255,107,53,.4);
+}
+html,body{background:var(--bg);color:var(--tx);font-family:"JetBrains Mono",monospace;font-size:13px;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+/* NAV */
+nav{display:flex;align-items:center;justify-content:space-between;padding:12px 32px;background:rgba(8,8,16,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--br);position:sticky;top:0;z-index:100}
+.nav-logo{font-family:"Syne",sans-serif;font-size:16px;font-weight:800;letter-spacing:3px;color:var(--ac);text-decoration:none;display:flex;align-items:center;gap:8px}
+.nav-logo span{font-size:9px;color:var(--mt);font-family:"JetBrains Mono",monospace;letter-spacing:1px}
+.nav-links{display:flex;align-items:center;gap:6px}
+.nav-link{padding:5px 12px;border-radius:4px;text-decoration:none;font-size:10px;letter-spacing:.5px;color:var(--mt);transition:color .15s,background .15s}
+.nav-link:hover{color:var(--tx);background:rgba(255,255,255,.05)}
+.nav-cta{padding:6px 14px;border-radius:4px;text-decoration:none;font-size:10px;font-weight:700;letter-spacing:.5px;background:transparent;color:var(--ac);border:1px solid var(--br3);transition:all .15s}
+.nav-cta:hover{background:var(--ac);color:#fff}
+
+/* PAGE */
+#page{min-height:100vh;display:flex;flex-direction:column}
+
+/* DEMO HEADER */
+.demo-header{padding:36px 32px 24px;border-bottom:1px solid var(--br)}
+.demo-header-inner{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;max-width:1200px;margin:0 auto;width:100%}
+.demo-title-block{}
+.demo-tag{font-size:9px;letter-spacing:2px;color:var(--ac);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.demo-tag::before{content:"";width:20px;height:1px;background:var(--ac)}
+.demo-h{font-family:"Syne",sans-serif;font-size:28px;font-weight:800;line-height:1.1;letter-spacing:-1px;margin-bottom:8px}
+.demo-sub{font-size:12px;color:var(--mt);max-width:420px;line-height:1.7}
+.demo-meta{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start}
+.meta-badge{display:flex;flex-direction:column;align-items:center;padding:12px 16px;background:var(--warm2);border:1px solid var(--br2);border-radius:8px;min-width:72px}
+.meta-val{font-family:"Syne",sans-serif;font-size:18px;font-weight:800;color:var(--ac);line-height:1}
+.meta-label{font-size:8px;color:var(--mt);letter-spacing:1px;margin-top:4px}
+
+/* BODY LAYOUT */
+.demo-body{display:flex;flex:1;overflow:hidden}
+.demo-main{flex:1;padding:24px 32px;overflow-y:auto;min-width:0}
+.demo-main::-webkit-scrollbar{width:4px}
+.demo-main::-webkit-scrollbar-thumb{background:var(--sf3);border-radius:2px}
+.demo-sidebar{width:280px;flex-shrink:0;background:var(--sf);border-left:1px solid var(--br2);display:flex;flex-direction:column;overflow:hidden}
+
+/* PLUGIN MOUNT */
+.plugin-section{max-width:900px;margin:0 auto}
+.plugin-section-title{font-size:9px;letter-spacing:2px;color:var(--mt);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+.plugin-status{font-size:9px;color:var(--gn)}
+#plugin-mount{border-radius:10px;overflow:hidden;border:1px solid var(--br2)}
+
+/* NOTICE */
+.audio-notice{display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(255,209,102,.06);border:1px solid rgba(255,209,102,.18);border-radius:7px;margin-bottom:16px;font-size:11px;color:#9a8050}
+.audio-notice strong{color:var(--ac3)}
+
+/* SIDEBAR */
+.sb-section{padding:14px 16px;border-bottom:1px solid var(--br)}
+.sb-h{font-size:9px;letter-spacing:1.5px;color:var(--mt);margin-bottom:10px;font-family:"JetBrains Mono",monospace}
+
+/* SIDEBAR — log */
+.sb-log{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
+.sb-log-list{flex:1;overflow-y:auto;padding:8px 16px}
+.sb-log-list::-webkit-scrollbar{width:3px}
+.sb-log-list::-webkit-scrollbar-thumb{background:var(--sf3)}
+.log-entry{font-size:9px;padding:3px 0;border-bottom:1px solid var(--br);display:flex;gap:6px;line-height:1.5}
+.log-ts{color:var(--dim);flex-shrink:0}
+.log-msg{color:var(--mt)}
+.log-msg.event{color:var(--tl)}
+.log-msg.bounce{color:var(--gn)}
+.log-msg.action{color:var(--ac2)}
+.log-msg.error{color:#e84040}
+
+/* SIDEBAR — bounces */
+.bounce-item{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--br);font-size:9px}
+.bounce-name{flex:1;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bounce-dur{color:var(--mt);flex-shrink:0}
+.bi-btn{padding:2px 8px;border-radius:3px;border:1px solid;background:transparent;font-family:inherit;font-size:8px;cursor:pointer;transition:all .1s}
+.bi-play{color:var(--gn);border-color:rgba(82,217,160,.3)}
+.bi-play:hover,.bi-play.active{background:var(--gn);color:#0a2c1e;border-color:var(--gn)}
+.bi-dl{color:var(--ac2);border-color:rgba(255,154,108,.3)}
+.bi-dl:hover{background:var(--ac2);color:#2a0c00;border-color:var(--ac2)}
+.bounce-empty{font-size:10px;color:var(--dim);padding:8px 0}
+
+/* SIDEBAR — code */
+pre.sb-code{font-size:9px;line-height:1.8;color:#9a8060;overflow-x:auto;background:var(--warm2);padding:12px;border-radius:6px;border:1px solid var(--br)}
+pre.sb-code::-webkit-scrollbar{height:3px}
+pre.sb-code::-webkit-scrollbar-thumb{background:var(--dim)}
+.tok-kw2{color:#ff9a6c}.tok-cls2{color:#ffd166}.tok-fn2{color:#52d9a0}.tok-str2{color:#a29bfe}.tok-cm2{color:#4a3c34;font-style:italic}
+
+/* TABS */
+.sb-tabs{display:flex;border-bottom:1px solid var(--br2)}
+.sb-tab{flex:1;padding:8px;font-size:9px;letter-spacing:1px;color:var(--mt);cursor:pointer;text-align:center;border:none;background:transparent;font-family:inherit;transition:color .1s,background .1s;border-bottom:2px solid transparent}
+.sb-tab.active{color:var(--tx);border-bottom-color:var(--ac)}
+.sb-tab:hover:not(.active){color:var(--tx);background:rgba(255,255,255,.03)}
+.sb-pane{display:none;flex:1;flex-direction:column;overflow:hidden;min-height:0}
+.sb-pane.active{display:flex;flex-direction:column}
+
+/* FOOTER */
+.demo-footer{padding:16px 32px;border-top:1px solid var(--br);display:flex;align-items:center;justify-content:space-between;font-size:10px;color:var(--dim);flex-wrap:wrap;gap:8px}
+.demo-footer a{color:var(--mt);text-decoration:none;transition:color .15s}
+.demo-footer a:hover{color:var(--ac)}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .demo-sidebar{display:none}
+  nav{padding:10px 16px}
+  .demo-header{padding:24px 16px 20px}
+  .demo-main{padding:16px}
+}
+@media(max-width:600px){.demo-meta{display:none}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">WAVR<span>PLUGIN SDK</span></a>
+  <div class="nav-links">
+    <a href="index.html" class="nav-link">← Back to docs</a>
+    <a href="https://github.com" class="nav-cta">↓ Download</a>
+  </div>
+</nav>
+
+<div id="page">
+  <div class="demo-header">
+    <div class="demo-header-inner">
+      <div class="demo-title-block">
+        <div class="demo-tag">LIVE DEMO</div>
+        <h1 class="demo-h">Drum Machine Plugin</h1>
+        <p class="demo-sub">A 16/32-step sequencer with 8 synthesized instruments, swing, per-step velocity, and session-persistent patterns. Click Play to start. Right-click any step to set velocity. Bounce renders to a downloadable WAV.</p>
+      </div>
+      <div class="demo-meta">
+        <div class="meta-badge"><div class="meta-val">8</div><div class="meta-label">INSTRUMENTS</div></div>
+        <div class="meta-badge"><div class="meta-val">32</div><div class="meta-label">MAX STEPS</div></div>
+        <div class="meta-badge"><div class="meta-val">4</div><div class="meta-label">PRESETS</div></div>
+        <div class="meta-badge"><div class="meta-val">0</div><div class="meta-label">DEPS</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="demo-body">
+    <div class="demo-main">
+      <div class="plugin-section">
+        <div class="plugin-section-title">
+          <span>⬡ DRUM MACHINE v2.0 · WavrPlugin</span>
+          <span class="plugin-status" id="plugin-status">Ready</span>
+        </div>
+        <div class="audio-notice">
+          <strong>⚠ Audio notice:</strong>&nbsp; Browser autoplay policy requires a user gesture before audio starts. Click Play inside the plugin to activate the audio context.
+        </div>
+        <div id="plugin-mount"></div>
+      </div>
+
+      <!-- HOW TO USE -->
+      <div style="max-width:900px;margin:36px auto 0;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px">
+        <div style="background:var(--warm2);border:1px solid var(--br);border-radius:8px;padding:16px">
+          <div style="font-size:18px;margin-bottom:8px">▶</div>
+          <div style="font-family:Syne,sans-serif;font-size:12px;font-weight:700;margin-bottom:5px">Play</div>
+          <div style="font-size:11px;color:var(--mt);line-height:1.6">Click Play inside the plugin to start the sequencer.</div>
+        </div>
+        <div style="background:var(--warm2);border:1px solid var(--br);border-radius:8px;padding:16px">
+          <div style="font-size:18px;margin-bottom:8px">⬡</div>
+          <div style="font-family:Syne,sans-serif;font-size:12px;font-weight:700;margin-bottom:5px">Steps</div>
+          <div style="font-size:11px;color:var(--mt);line-height:1.6">Click any step button to toggle it. Right-click for velocity.</div>
+        </div>
+        <div style="background:var(--warm2);border:1px solid var(--br);border-radius:8px;padding:16px">
+          <div style="font-size:18px;margin-bottom:8px">◎</div>
+          <div style="font-family:Syne,sans-serif;font-size:12px;font-weight:700;margin-bottom:5px">Bounce</div>
+          <div style="font-size:11px;color:var(--mt);line-height:1.6">Click ↓ Bounce to render a WAV. It appears in the sidebar.</div>
+        </div>
+        <div style="background:var(--warm2);border:1px solid var(--br);border-radius:8px;padding:16px">
+          <div style="font-size:18px;margin-bottom:8px">↻</div>
+          <div style="font-family:Syne,sans-serif;font-size:12px;font-weight:700;margin-bottom:5px">Presets</div>
+          <div style="font-size:11px;color:var(--mt);line-height:1.6">Try Hip Hop, House, Techno, or Jungle in the footer.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="demo-sidebar">
+      <div style="padding:0">
+        <div class="sb-tabs">
+          <button class="sb-tab active" data-tab="log">Event Log</button>
+          <button class="sb-tab" data-tab="bounces">Bounces</button>
+          <button class="sb-tab" data-tab="code">Integration</button>
+        </div>
+      </div>
+
+      <div class="sb-pane active" id="pane-log">
+        <div class="sb-log-list" id="log-list"></div>
+      </div>
+
+      <div class="sb-pane" id="pane-bounces">
+        <div class="sb-section" style="flex:1;overflow-y:auto">
+          <div class="sb-h">BOUNCED AUDIO</div>
+          <div id="bounce-list"><div class="bounce-empty">No bounces yet — click ↓ Bounce inside the plugin.</div></div>
+        </div>
+      </div>
+
+      <div class="sb-pane" id="pane-code">
+        <div style="padding:14px 16px;overflow-y:auto;flex:1">
+          <div class="sb-h">REGISTER IN WAVR PRO</div>
+          <pre class="sb-code"><span class="tok-cm2">// WavrPro.jsx — add these</span>
+<span class="tok-kw2">import</span> DrumMachine
+  <span class="tok-kw2">from</span> <span class="tok-str2">"./plugins/DrumMachine"</span>;
+
+<span class="tok-cm2">// Inside component:</span>
+<span class="tok-kw2">const</span> pm = <span class="tok-fn2">usePluginManager</span>({
+  audioCtxRef, bpmRef ...
+});
+
+<span class="tok-fn2">useEffect</span>(() => {
+  pm.<span class="tok-fn2">register</span>(DrumMachine);
+}, []);
+
+<span class="tok-cm2">// In topbar:</span>
+&lt;<span class="tok-cls2">button</span> onClick={() =>
+  pm.<span class="tok-fn2">toggle</span>(<span class="tok-str2">"drum-machine"</span>)}&gt;
+  Drums
+&lt;/<span class="tok-cls2">button</span>&gt;
+
+<span class="tok-cm2">// In JSX:</span>
+{pm.plugins.<span class="tok-fn2">filter</span>(p => p.isOpen)
+  .<span class="tok-fn2">map</span>(p => (
+  &lt;<span class="tok-cls2">PluginShell</span>
+    pluginClass={p.cls}
+    hostAPI={pm.<span class="tok-fn2">getHostAPI</span>(p.id)}
+    open={p.isOpen}
+    onClose={() =>
+      pm.<span class="tok-fn2">close</span>(p.id)}
+  /&gt;
+))}</pre>
+          <div style="margin-top:14px">
+            <div class="sb-h">STANDALONE (NO REACT)</div>
+            <pre class="sb-code">&lt;<span class="tok-cls2">script</span> src=<span class="tok-str2">"WavrPlugin.js"</span>&gt;&lt;/<span class="tok-cls2">script</span>&gt;
+&lt;<span class="tok-cls2">script</span> src=<span class="tok-str2">"DrumMachine.js"</span>&gt;&lt;/<span class="tok-cls2">script</span>&gt;
+
+<span class="tok-kw2">const</span> dm = <span class="tok-kw2">new</span> <span class="tok-cls2">DrumMachine</span>({
+  audioContext: ctx,
+  bpm: <span class="tok-str2">120</span>
+});
+
+dm.<span class="tok-fn2">onRender</span> = (buf, bpm) => {
+  <span class="tok-cm2">// got AudioBuffer</span>
+};
+
+dm.<span class="tok-fn2">mount</span>(
+  document.<span class="tok-fn2">getElementById</span>(<span class="tok-str2">"host"</span>)
+);</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="demo-footer">
+    <span>WAVR Plugin SDK · MIT Licence · Web Audio API</span>
+    <div style="display:flex;gap:16px">
+      <a href="index.html">Docs</a>
+      <a href="https://github.com">GitHub</a>
+      <a href="https://github.com">COMMUNITY.md</a>
+    </div>
+  </div>
+</div>
+
+<script>
+/**
+ * WavrPlugin.js — Base class for all WAVR plugins
+ *
+ * Extend this class to create a plugin. Implement the required methods
+ * (mount, destroy, getState, setState) and use the provided helpers
+ * (emitBuffer, emitStateChange, notify) to communicate with the host DAW.
+ *
+ * The host injects a HostAPI object as the first constructor argument.
+ * Use this.host, this.ctx, and this.bpm to access host services.
+ *
+ * @example
+ *   class MyPlugin extends WavrPlugin {
+ *     static pluginId    = "my-plugin";
+ *     static pluginName  = "My Plugin";
+ *     static pluginColor = "#6c5ce7";
+ *     static pluginMode  = "modal";  // "modal" | "drawer" | "inline"
+ *
+ *     constructor(hostAPI, options) {
+ *       super(hostAPI, options);
+ *       this._state = { gain: 1.0 };
+ *     }
+ *
+ *     mount(el) {
+ *       this._el = el;
+ *       el.innerHTML = `<button id="go">Bounce</button>`;
+ *       el.querySelector("#go").addEventListener("click", async () => {
+ *         const buf = await this._renderSomething();
+ *         this.emitBuffer(buf);                   // → drops onto a new DAW track
+ *         this.notify("Done!", "success");
+ *       });
+ *     }
+ *
+ *     destroy() {
+ *       // stop timers, disconnect audio nodes
+ *       super.destroy();   // always call last — clears el.innerHTML
+ *     }
+ *
+ *     getState() { return { ...this._state }; }
+ *     setState(s) { this._state = { ...this._state, ...s }; }
+ *   }
+ */
+
+class WavrPlugin {
+  // ── Static metadata — override in every subclass ─────────────
+  /** Unique snake_case identifier.  Used as the registry key. */
+  static pluginId    = "wavr-plugin";
+  /** Human-readable display name shown in the DAW topbar. */
+  static pluginName  = "WAVR Plugin";
+  /** Accent colour for the plugin chrome (CSS hex). */
+  static pluginColor = "#6c5ce7";
+  /** Default UI presentation.  "modal" | "drawer" | "inline" */
+  static pluginMode  = "modal";
+  /** Categorises the plugin in the browser UI. */
+  static pluginCategory = "utility"; // "instrument" | "effect" | "utility" | "generator"
+  /** Short description shown in the plugin browser. */
+  static pluginDescription = "";
+  /** SemVer string. */
+  static pluginVersion = "1.0.0";
+
+  /**
+   * @param {HostAPI} hostAPI  Injected by WavrPro at instantiation time.
+   * @param {object}  options  Plugin-specific config (passed through from the shell).
+   */
+  constructor(hostAPI, options = {}) {
+    if (!hostAPI) throw new Error("WavrPlugin: hostAPI is required");
+
+    // ── Host services ─────────────────────────────────────────
+    /** Full HostAPI reference. */
+    this.host    = hostAPI;
+    /** The shared AudioContext.  Do NOT close it — it belongs to the host. */
+    this.ctx     = hostAPI.audioContext;
+    /** BPM snapshot at mount time.  Updated by onBpmChange(). */
+    this.bpm     = hostAPI.bpm;
+    /** Options passed by the consuming application. */
+    this.options = options;
+
+    // ── Internal ──────────────────────────────────────────────
+    /** The DOM element this plugin is mounted into. Set by mount(). */
+    this._el        = null;
+    /** Serialisable plugin state.  Persist everything here. */
+    this._state     = {};
+    this._destroyed = false;
+  }
+
+  // ── Required — every plugin MUST implement these ─────────────
+
+  /**
+   * Build and inject the plugin UI into `el`.
+   * Called once after construction.  Always set this._el = el.
+   * @param {HTMLElement} el
+   */
+  mount(el) {
+    throw new Error(`${this.constructor.name}: mount(el) is not implemented`);
+  }
+
+  /**
+   * Tear down the plugin.
+   * Stop all audio, remove event listeners, cancel timers.
+   * Always call super.destroy() at the END of your override — it clears the DOM.
+   */
+  destroy() {
+    this._destroyed = true;
+    if (this._el) this._el.innerHTML = "";
+  }
+
+  /**
+   * Return a plain JSON-serialisable snapshot of plugin state.
+   * Called by the host when saving a session.
+   * @returns {object}
+   */
+  getState() {
+    return { ...this._state };
+  }
+
+  /**
+   * Restore state from a previously returned getState() object.
+   * Called by the host when loading a session or re-opening the plugin.
+   * @param {object} state
+   */
+  setState(state) {
+    this._state = { ...this._state, ...state };
+  }
+
+  // ── Transport hooks — override as needed ──────────────────────
+
+  /**
+   * Host calls this whenever the transport BPM changes.
+   * Call super.onBpmChange(bpm) to keep this.bpm in sync.
+   * @param {number} bpm
+   */
+  onBpmChange(bpm) {
+    this.bpm = bpm;
+  }
+
+  /**
+   * Host calls this when transport starts playing.
+   * @param {number} startBeat      Beat position playback starts at.
+   * @param {number} contextTime    audioContext.currentTime at play start.
+   */
+  onTransportStart(startBeat, contextTime) {}
+
+  /** Host calls this when transport stops. */
+  onTransportStop() {}
+
+  /**
+   * Host calls this on every rAF frame while playing.
+   * Keep implementation cheap — it runs 60×/sec.
+   * @param {number} currentBeat
+   */
+  onPlayheadTick(currentBeat) {}
+
+  // ── Helpers — use these to talk back to the host ──────────────
+
+  /**
+   * Send an AudioBuffer to the host to be placed on a new track.
+   * Equivalent to a plugin "bouncing" its output into the DAW timeline.
+   *
+   * @param {AudioBuffer} buffer    The rendered audio.
+   * @param {string}      [label]   Optional track / clip name.
+   * @throws {TypeError}  If buffer is not a valid AudioBuffer.
+   */
+  emitBuffer(buffer, label) {
+    if (!(buffer instanceof AudioBuffer))
+      throw new TypeError("emitBuffer: argument must be an AudioBuffer");
+    if (this._destroyed) return;
+    this.host.onRender(buffer, this.bpm, label || this.constructor.pluginName);
+  }
+
+  /**
+   * Tell the host that internal state has changed.
+   * Triggers a session "dirty" flag so the user is prompted to save.
+   */
+  emitStateChange() {
+    if (this._destroyed) return;
+    this.host.onStateChange(this.getState());
+  }
+
+  /**
+   * Display a toast notification in the host DAW.
+   * @param {string}  message
+   * @param {"info"|"success"|"warn"|"error"} [level="info"]
+   */
+  notify(message, level = "info") {
+    if (this._destroyed) return;
+    this.host.onNotify(message, level);
+  }
+
+  // ── Utility ───────────────────────────────────────────────────
+
+  /**
+   * Convenience: beats → seconds at current BPM.
+   * @param {number} beats
+   * @returns {number} seconds
+   */
+  b2s(beats) { return (beats / this.bpm) * 60; }
+
+  /**
+   * Convenience: seconds → beats at current BPM.
+   * @param {number} seconds
+   * @returns {number} beats
+   */
+  s2b(seconds) { return (seconds / 60) * this.bpm; }
+}
+
+// ── HostAPI shape (informational — not enforced at runtime) ──────
+//
+// The object WavrPro constructs and passes to each plugin:
+//
+// interface HostAPI {
+//   readonly audioContext : AudioContext
+//   readonly bpm          : number
+//
+//   onRender(buffer: AudioBuffer, bpm: number, label?: string): void
+//     Drop a rendered AudioBuffer onto a new DAW track.
+//
+//   onStateChange(state: object): void
+//     Notify the host that plugin state changed.
+//
+//   onNotify(message: string, level: "info"|"success"|"warn"|"error"): void
+//     Show a toast in the DAW UI.
+//
+//   addTrack(name: string, color?: string): Track
+//     Create an empty track and return it.
+//
+//   getPlayhead(): { beat: number, isPlaying: boolean, contextTime: number }
+//     Read the current transport position.
+//
+//   getTracks(): TrackSummary[]
+//     Read-only snapshot of all current tracks.
+// }
+
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = WavrPlugin;
+} else if (typeof window !== "undefined") {
+  window.WavrPlugin = WavrPlugin;
+}
+
+
+/**
+ * DrumMachine.js — VST-style drum sequencer plugin
+ * Pure vanilla JS class. Zero dependencies. Zero framework lock-in.
+ *
+ * USAGE (plain HTML):
+ *   const dm = new DrumMachine({ audioContext: myCtx, bpm: 120 });
+ *   dm.mount(document.getElementById('container'));
+ *
+ * USAGE (React — inject via useEffect):
+ *   useEffect(() => {
+ *     const dm = new DrumMachine({ audioContext: getCtx(), bpm });
+ *     dm.mount(containerRef.current);
+ *     return () => dm.destroy();
+ *   }, []);
+ *
+ * INTEGRATION with WavrPro:
+ *   dm.onRender = (audioBuffer, bpm) => {
+ *     // audioBuffer is the rendered 1-bar loop at current bpm
+ *     // drop it into a track clip however you like
+ *   };
+ *
+ * API:
+ *   dm.mount(el)        — render UI into el, start internal clock
+ *   dm.destroy()        — stop, remove UI, release audio nodes
+ *   dm.setBpm(120)      — sync to host transport BPM
+ *   dm.start()          — begin internal sequencer loop
+ *   dm.stop()           — halt sequencer
+ *   dm.getPattern()     — returns serialisable pattern state
+ *   dm.loadPattern(obj) — restore previously saved pattern state
+ *   dm.renderToBuffer() — returns Promise<AudioBuffer> (1 bar)
+ *   dm.onRender         — callback(AudioBuffer, bpm) called after renderToBuffer
+ *   dm.onPatternChange  — callback(pattern) called on any step/param change
+ */
+
+class DrumMachine extends WavrPlugin {
+  // ── Plugin metadata ──────────────────────────────────────────
+  static pluginId          = "drum-machine";
+  static pluginName        = "Drum Machine";
+  static pluginColor       = "#ff6b35";
+  static pluginMode        = "modal";
+  static pluginCategory    = "instrument";
+  static pluginDescription = "16/32-step drum sequencer with 8 synthesized instruments, swing, velocity, and presets.";
+  static pluginVersion     = "2.0.0";
+
+  // ── Default instruments ─────────────────────────────────────
+  static INSTRUMENTS = [
+    {
+      id: "kick",
+      label: "Kick",
+      color: "#ff6b35",
+      synth: (ctx, when, vel) => {
+        const g = ctx.createGain();
+        g.connect(ctx.destination);
+        // pitch-swept body
+        const o = ctx.createOscillator();
+        o.type = "sine";
+        o.frequency.setValueAtTime(180, when);
+        o.frequency.exponentialRampToValueAtTime(38, when + 0.12);
+        g.gain.setValueAtTime(vel * 1.1, when);
+        g.gain.exponentialRampToValueAtTime(0.001, when + 0.38);
+        o.connect(g); o.start(when); o.stop(when + 0.4);
+        // click transient
+        const c = ctx.createOscillator(), cg = ctx.createGain();
+        c.type = "square"; c.frequency.value = 1400;
+        cg.gain.setValueAtTime(vel * 0.35, when);
+        cg.gain.exponentialRampToValueAtTime(0.001, when + 0.012);
+        c.connect(cg); cg.connect(ctx.destination); c.start(when); c.stop(when + 0.015);
+      },
+    },
+    {
+      id: "snare",
+      label: "Snare",
+      color: "#ff9a6c",
+      synth: (ctx, when, vel) => {
+        const sr = ctx.sampleRate;
+        // noise
+        const len = Math.ceil(0.22 * sr);
+        const nb = ctx.createBuffer(1, len, sr);
+        const nd = nb.getChannelData(0);
+        for (let i = 0; i < len; i++) nd[i] = Math.random() * 2 - 1;
+        const ns = ctx.createBufferSource(); ns.buffer = nb;
+        const filt = ctx.createBiquadFilter(); filt.type = "bandpass"; filt.frequency.value = 3800; filt.Q.value = 0.9;
+        const ng = ctx.createGain();
+        ng.gain.setValueAtTime(vel * 0.65, when); ng.gain.exponentialRampToValueAtTime(0.001, when + 0.2);
+        ns.connect(filt); filt.connect(ng); ng.connect(ctx.destination); ns.start(when); ns.stop(when + 0.25);
+        // body tone
+        const o = ctx.createOscillator(), og = ctx.createGain();
+        o.type = "triangle"; o.frequency.value = 190;
+        og.gain.setValueAtTime(vel * 0.3, when); og.gain.exponentialRampToValueAtTime(0.001, when + 0.08);
+        o.connect(og); og.connect(ctx.destination); o.start(when); o.stop(when + 0.1);
+      },
+    },
+    {
+      id: "clap",
+      label: "Clap",
+      color: "#ffd166",
+      synth: (ctx, when, vel) => {
+        const sr = ctx.sampleRate;
+        [0, 0.008, 0.016].forEach(offset => {
+          const len = Math.ceil(0.12 * sr);
+          const nb = ctx.createBuffer(1, len, sr);
+          const nd = nb.getChannelData(0);
+          for (let i = 0; i < len; i++) nd[i] = Math.random() * 2 - 1;
+          const ns = ctx.createBufferSource(); ns.buffer = nb;
+          const f = ctx.createBiquadFilter(); f.type = "bandpass"; f.frequency.value = 1100; f.Q.value = 1.2;
+          const g = ctx.createGain();
+          g.gain.setValueAtTime(vel * (offset === 0 ? 0.5 : 0.35), when + offset);
+          g.gain.exponentialRampToValueAtTime(0.001, when + offset + 0.1);
+          ns.connect(f); f.connect(g); g.connect(ctx.destination); ns.start(when + offset); ns.stop(when + offset + 0.14);
+        });
+      },
+    },
+    {
+      id: "hhc",
+      label: "HH Closed",
+      color: "#52d9a0",
+      synth: (ctx, when, vel) => {
+        const sr = ctx.sampleRate;
+        const len = Math.ceil(0.05 * sr);
+        const nb = ctx.createBuffer(1, len, sr);
+        const nd = nb.getChannelData(0);
+        for (let i = 0; i < len; i++) nd[i] = Math.random() * 2 - 1;
+        const ns = ctx.createBufferSource(); ns.buffer = nb;
+        const f = ctx.createBiquadFilter(); f.type = "highpass"; f.frequency.value = 8000;
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(vel * 0.28, when); g.gain.exponentialRampToValueAtTime(0.001, when + 0.045);
+        ns.connect(f); f.connect(g); g.connect(ctx.destination); ns.start(when); ns.stop(when + 0.06);
+      },
+    },
+    {
+      id: "hho",
+      label: "HH Open",
+      color: "#4fc3f7",
+      synth: (ctx, when, vel) => {
+        const sr = ctx.sampleRate;
+        const len = Math.ceil(0.35 * sr);
+        const nb = ctx.createBuffer(1, len, sr);
+        const nd = nb.getChannelData(0);
+        for (let i = 0; i < len; i++) nd[i] = Math.random() * 2 - 1;
+        const ns = ctx.createBufferSource(); ns.buffer = nb;
+        const f = ctx.createBiquadFilter(); f.type = "highpass"; f.frequency.value = 6000;
+        const f2 = ctx.createBiquadFilter(); f2.type = "peaking"; f2.frequency.value = 10000; f2.gain.value = 6;
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(vel * 0.22, when); g.gain.exponentialRampToValueAtTime(0.001, when + 0.32);
+        ns.connect(f); f.connect(f2); f2.connect(g); g.connect(ctx.destination); ns.start(when); ns.stop(when + 0.36);
+      },
+    },
+    {
+      id: "tom_hi",
+      label: "Tom Hi",
+      color: "#a29bfe",
+      synth: (ctx, when, vel) => {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = "sine";
+        o.frequency.setValueAtTime(280, when);
+        o.frequency.exponentialRampToValueAtTime(120, when + 0.18);
+        g.gain.setValueAtTime(vel * 0.75, when); g.gain.exponentialRampToValueAtTime(0.001, when + 0.22);
+        o.connect(g); g.connect(ctx.destination); o.start(when); o.stop(when + 0.25);
+      },
+    },
+    {
+      id: "tom_mid",
+      label: "Tom Mid",
+      color: "#fd79a8",
+      synth: (ctx, when, vel) => {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = "sine";
+        o.frequency.setValueAtTime(180, when);
+        o.frequency.exponentialRampToValueAtTime(75, when + 0.22);
+        g.gain.setValueAtTime(vel * 0.78, when); g.gain.exponentialRampToValueAtTime(0.001, when + 0.28);
+        o.connect(g); g.connect(ctx.destination); o.start(when); o.stop(when + 0.32);
+      },
+    },
+    {
+      id: "ride",
+      label: "Ride",
+      color: "#ffeaa7",
+      synth: (ctx, when, vel) => {
+        const sr = ctx.sampleRate;
+        const len = Math.ceil(0.5 * sr);
+        const nb = ctx.createBuffer(1, len, sr);
+        const nd = nb.getChannelData(0);
+        for (let i = 0; i < len; i++) nd[i] = Math.random() * 2 - 1;
+        const ns = ctx.createBufferSource(); ns.buffer = nb;
+        const f = ctx.createBiquadFilter(); f.type = "bandpass"; f.frequency.value = 5500; f.Q.value = 0.5;
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(vel * 0.18, when); g.gain.exponentialRampToValueAtTime(0.001, when + 0.45);
+        ns.connect(f); f.connect(g); g.connect(ctx.destination); ns.start(when); ns.stop(when + 0.55);
+      },
+    },
+  ];
+
+  constructor(hostAPIOrLegacy, optionsOrUndefined = {}) {
+    // Support plugin-framework call: new DrumMachine(hostAPI, options)
+    // AND legacy standalone call:    new DrumMachine({ audioContext, bpm, steps })
+    const isLegacy = !hostAPIOrLegacy || !hostAPIOrLegacy.onRender;
+    const legacyCtx  = isLegacy ? (hostAPIOrLegacy?.audioContext || new (window.AudioContext || window.webkitAudioContext)()) : null;
+    const resolvedHostAPI = isLegacy ? {
+      audioContext:  legacyCtx,
+      bpm:           hostAPIOrLegacy?.bpm || 120,
+      onRender:      () => {},
+      onStateChange: () => {},
+      onNotify:      (msg) => console.log("[DrumMachine]", msg),
+      addTrack:      () => ({ id: null, clips: [] }),
+      getPlayhead:   () => ({ beat: 0, isPlaying: false, contextTime: 0 }),
+      getTracks:     () => [],
+    } : hostAPIOrLegacy;
+    const options = isLegacy ? (hostAPIOrLegacy || {}) : (optionsOrUndefined || {});
+    super(resolvedHostAPI, options);
+    const bpm      = resolvedHostAPI.bpm || 120;
+    const steps    = options.steps    || (isLegacy && hostAPIOrLegacy?.steps)    || 16;
+    const container= options.container|| (isLegacy && hostAPIOrLegacy?.container)|| null;
+    this._bpm    = bpm;
+    this._steps  = steps;       // 16 or 32
+    this._swing  = 0;           // 0–100
+    this._masterVol = 0.85;
+    this._running = false;
+    this._currentStep = 0;
+    this._nextStepTime = 0;
+    this._timerID = null;
+    this._scheduleAheadTime = 0.1;
+    this._lookahead = 25; // ms
+    this._el = null;
+
+    // Master gain
+    this._masterGain = this.ctx.createGain();
+    this._masterGain.gain.value = this._masterVol;
+    this._masterGain.connect(this.ctx.destination);
+
+    // Per-instrument gains routed through master
+    this._instrGains = {};
+    DrumMachine.INSTRUMENTS.forEach(inst => {
+      const g = this.ctx.createGain();
+      g.gain.value = 1;
+      g.connect(this._masterGain);
+      this._instrGains[inst.id] = g;
+    });
+
+    // Pattern: [instrId][step] = { active, velocity (0–1) }
+    this._pattern = this._defaultPattern();
+
+    // Callbacks
+    this.onRender        = null; // (AudioBuffer, bpm) => void
+    this.onPatternChange = null; // (pattern) => void
+    this.onStepTick      = null; // (step) => void — for host transport sync
+
+    if (container) this.mount(container);
+  }
+
+  // ── Public API ─────────────────────────────────────────────
+
+  mount(el) {
+    this._el = el;
+    this._injectStyles();
+    el.innerHTML = this._buildHTML();
+    this._bindEvents();
+    this._updateStepHighlight(-1);
+  }
+
+  destroy() {
+    this.stop();
+    this._masterGain.disconnect();
+    super.destroy();  // clears this._el.innerHTML
+  }
+
+  setBpm(bpm) {
+    this._bpm = Math.max(20, Math.min(300, bpm));
+    const inp = this._el?.querySelector(".dm-bpm-input");
+    if (inp) inp.value = this._bpm;
+  }
+
+  start() {
+    if (this._running) return;
+    if (this.ctx.state === "suspended") this.ctx.resume();
+    this._running = true;
+    this._currentStep = 0;
+    this._nextStepTime = this.ctx.currentTime + 0.05;
+    this._scheduler();
+    this._el?.querySelector(".dm-play-btn")?.classList.add("dm-active");
+  }
+
+  stop() {
+    this._running = false;
+    clearTimeout(this._timerID);
+    this._updateStepHighlight(-1);
+    this._el?.querySelector(".dm-play-btn")?.classList.remove("dm-active");
+  }
+
+  toggle() { this._running ? this.stop() : this.start(); }
+
+  getPattern() {
+    return {
+      bpm:     this._bpm,
+      steps:   this._steps,
+      swing:   this._swing,
+      master:  this._masterVol,
+      pattern: JSON.parse(JSON.stringify(this._pattern)),
+      instrVols: Object.fromEntries(
+        DrumMachine.INSTRUMENTS.map(i => [i.id, this._instrGains[i.id].gain.value])
+      ),
+    };
+  }
+
+  loadPattern(state) {
+    if (!state) return;
+    if (state.bpm)     { this._bpm     = state.bpm;     this.setBpm(state.bpm); }
+    if (state.steps)   { this._steps   = state.steps;   }
+    if (state.swing !== undefined)  this._swing  = state.swing;
+    if (state.master !== undefined) {
+      this._masterVol = state.master;
+      this._masterGain.gain.value = state.master;
+    }
+    if (state.pattern) this._pattern = state.pattern;
+    if (state.instrVols) {
+      Object.entries(state.instrVols).forEach(([id, vol]) => {
+        if (this._instrGains[id]) this._instrGains[id].gain.value = vol;
+      });
+    }
+    if (this._el) {
+      this._el.innerHTML = this._buildHTML();
+      this._bindEvents();
+      this._updateStepHighlight(-1);
+    }
+  }
+
+  async renderToBuffer() {
+    const stepSec  = this._stepDuration();
+    const totalSec = stepSec * this._steps;
+    const sr       = this.ctx.sampleRate;
+    const offCtx   = new OfflineAudioContext(2, Math.ceil(sr * totalSec), sr);
+
+    // re-route through offline master gain
+    const omg = offCtx.createGain();
+    omg.gain.value = this._masterVol;
+    omg.connect(offCtx.destination);
+
+    DrumMachine.INSTRUMENTS.forEach(inst => {
+      const ig = offCtx.createGain();
+      ig.gain.value = this._instrGains[inst.id].gain.value;
+      ig.connect(omg);
+
+      const instrCtxPatch = {
+        ...offCtx,
+        destination: ig,
+        sampleRate: offCtx.sampleRate,
+        createGain:            ()    => offCtx.createGain(),
+        createOscillator:      ()    => offCtx.createOscillator(),
+        createBiquadFilter:    ()    => offCtx.createBiquadFilter(),
+        createBuffer:          (c,l,r)=> offCtx.createBuffer(c,l,r),
+        createBufferSource:    ()    => offCtx.createBufferSource(),
+        currentTime:           0,
+      };
+
+      this._pattern[inst.id]?.forEach((cell, step) => {
+        if (!cell.active) return;
+        const t = this._swingTime(step, stepSec);
+        // patch destination so synth routes to per-instrument gain
+        const patchedCtx = new Proxy(offCtx, {
+          get(target, key) {
+            if (key === "destination") return ig;
+            const v = target[key];
+            return typeof v === "function" ? v.bind(target) : v;
+          }
+        });
+        inst.synth(patchedCtx, t, cell.velocity);
+      });
+    });
+
+    const buf = await offCtx.startRendering();
+    this.emitBuffer(buf, this.constructor.pluginName);
+    // Legacy callback
+    if (typeof this.onRender === "function") this.onRender(buf, this._bpm);
+    return buf;
+  }
+
+  // ── Internal: sequencer ──────────────────────────────────────
+
+  _stepDuration() {
+    // 1 step = 1 sixteenth note
+    return (60 / this._bpm) / 4;
+  }
+
+  _swingTime(step, stepSec) {
+    // Even steps: on-time. Odd steps: pushed forward by swing %
+    if (this._swing === 0 || step % 2 === 0) return step * stepSec;
+    const swingAmt = (this._swing / 100) * stepSec * 0.5;
+    return step * stepSec + swingAmt;
+  }
+
+  _scheduler() {
+    if (!this._running) return;
+    const stepSec = this._stepDuration();
+    while (this._nextStepTime < this.ctx.currentTime + this._scheduleAheadTime) {
+      this._scheduleStep(this._currentStep, this._nextStepTime);
+      this._advanceStep(stepSec);
+    }
+    this._timerID = setTimeout(() => this._scheduler(), this._lookahead);
+  }
+
+  _scheduleStep(step, when) {
+    DrumMachine.INSTRUMENTS.forEach(inst => {
+      const cell = this._pattern[inst.id]?.[step];
+      if (!cell?.active) return;
+
+      // patch ctx.destination → per-instrument gain
+      const ig = this._instrGains[inst.id];
+      const patchedCtx = new Proxy(this._ctx, {
+        get(target, key) {
+          if (key === "destination") return ig;
+          const v = target[key];
+          return typeof v === "function" ? v.bind(target) : v;
+        }
+      });
+      inst.synth(patchedCtx, when, cell.velocity);
+    });
+
+    // visual tick — fire slightly before the beat so UI feels tight
+    const delay = (when - this.ctx.currentTime) * 1000;
+    setTimeout(() => {
+      this._updateStepHighlight(step);
+      if (typeof this.onStepTick === "function") this.onStepTick(step);
+    }, Math.max(0, delay));
+  }
+
+  _advanceStep(stepSec) {
+    this._nextStepTime += this._swingTime(this._currentStep + 1, stepSec) - this._swingTime(this._currentStep, stepSec);
+    // Fallback: just use stepSec if swing math breaks
+    if (!isFinite(this._nextStepTime)) this._nextStepTime += stepSec;
+    this._currentStep = (this._currentStep + 1) % this._steps;
+  }
+
+  _updateStepHighlight(activeStep) {
+    if (!this._el) return;
+    this._el.querySelectorAll(".dm-step").forEach(btn => {
+      const s = parseInt(btn.dataset.step, 10);
+      btn.classList.toggle("dm-playing", s === activeStep);
+    });
+    // Also light up the step column indicator
+    this._el.querySelectorAll(".dm-step-num").forEach(el => {
+      el.classList.toggle("dm-step-num-active", parseInt(el.dataset.step, 10) === activeStep);
+    });
+  }
+
+  // ── WavrPlugin interface overrides ──────────────────────────
+
+  /** Returns pattern state — used by session save. */
+  getState() { return this.getPattern(); }
+
+  /** Restores pattern state — used by session load and re-open. */
+  setState(state) { this.loadPattern(state); }
+
+  /** Called by host when BPM changes in the DAW transport. */
+  onBpmChange(bpm) {
+    super.onBpmChange(bpm);
+    this._bpm = bpm;
+    const inp = this._el?.querySelector(".dm-bpm-input");
+    if (inp) inp.value = bpm;
+  }
+
+  // ── Internal: default pattern ────────────────────────────────
+
+  _defaultPattern() {
+    const p = {};
+    DrumMachine.INSTRUMENTS.forEach(inst => {
+      p[inst.id] = Array.from({ length: 32 }, () => ({ active: false, velocity: 0.8 }));
+    });
+    // sensible default: basic 4/4 kick + snare + closed hh
+    [0, 8].forEach(s => { p.kick[s].active    = true; });   // kick on 1 and 3
+    [4, 12].forEach(s => { p.snare[s].active  = true; });   // snare on 2 and 4
+    [0,2,4,6,8,10,12,14].forEach(s => { p.hhc[s].active = true; p.hhc[s].velocity = s%4===0?0.8:0.5; });
+    return p;
+  }
+
+  // ── Internal: HTML builder ───────────────────────────────────
+
+  _buildHTML() {
+    const insts = DrumMachine.INSTRUMENTS;
+    const steps = this._steps;
+
+    const stepNums = Array.from({ length: steps }, (_, i) => {
+      const isBar = i % 4 === 0;
+      return `<div class="dm-step-num${isBar?" dm-bar-num":""}" data-step="${i}">${isBar ? Math.floor(i/4)+1 : "·"}</div>`;
+    }).join("");
+
+    const rows = insts.map(inst => {
+      const cells = Array.from({ length: steps }, (_, i) => {
+        const cell = this._pattern[inst.id][i];
+        const groupClass = i % 4 === 0 ? " dm-group-start" : "";
+        const activeClass = cell.active ? " dm-on" : "";
+        const vel = cell.velocity;
+        return `<button
+          class="dm-step${activeClass}${groupClass}"
+          data-instr="${inst.id}"
+          data-step="${i}"
+          style="${cell.active ? `--dm-vel:${vel};opacity:${0.45+vel*0.55};background:${inst.color}` : ""}"
+          title="Step ${i+1} — right-click for velocity"
+        ></button>`;
+      }).join("");
+
+      const vol = this._instrGains[inst.id].gain.value;
+      return `
+        <div class="dm-row" data-instr="${inst.id}">
+          <div class="dm-row-label">
+            <div class="dm-instr-dot" style="background:${inst.color}"></div>
+            <span class="dm-instr-name">${inst.label}</span>
+            <button class="dm-solo-btn" data-instr="${inst.id}" title="Solo">S</button>
+            <button class="dm-mute-btn" data-instr="${inst.id}" title="Mute">M</button>
+          </div>
+          <div class="dm-cells">${cells}</div>
+          <div class="dm-row-vol">
+            <input type="range" class="dm-vol-slider" min="0" max="1" step="0.01"
+              value="${vol}" data-instr="${inst.id}" title="Volume: ${Math.round(vol*100)}">
+          </div>
+        </div>`;
+    }).join("");
+
+    return `
+      <div class="dm-root" data-steps="${steps}">
+        <div class="dm-header">
+          <span class="dm-logo">⬡ DRUM MACHINE</span>
+          <div class="dm-controls">
+            <button class="dm-btn dm-play-btn${this._running?" dm-active":""}">▶ Play</button>
+            <button class="dm-btn dm-stop-btn">■ Stop</button>
+            <div class="dm-sep"></div>
+            <label class="dm-label">BPM</label>
+            <input type="number" class="dm-bpm-input dm-num-input" min="20" max="300" value="${this._bpm}">
+            <label class="dm-label">Steps</label>
+            <select class="dm-steps-select dm-select">
+              <option value="16"${steps===16?" selected":""}>16</option>
+              <option value="32"${steps===32?" selected":""}>32</option>
+            </select>
+            <label class="dm-label">Swing</label>
+            <input type="range" class="dm-swing-slider" min="0" max="75" step="1" value="${this._swing}" title="Swing">
+            <span class="dm-swing-val">${this._swing}%</span>
+            <div class="dm-sep"></div>
+            <label class="dm-label">Vol</label>
+            <input type="range" class="dm-master-vol" min="0" max="1" step="0.01" value="${this._masterVol}" title="Master volume">
+          </div>
+          <div class="dm-actions">
+            <button class="dm-btn dm-clear-btn" title="Clear all steps">✕ Clear</button>
+            <button class="dm-btn dm-random-btn" title="Random pattern">⟳ Rand</button>
+            <button class="dm-btn dm-render-btn" title="Render 1 bar to audio">↓ Bounce</button>
+          </div>
+        </div>
+
+        <div class="dm-grid-wrap">
+          <div class="dm-step-nums-row">
+            <div class="dm-row-label-spacer"></div>
+            <div class="dm-step-nums">${stepNums}</div>
+            <div class="dm-vol-spacer"></div>
+          </div>
+          ${rows}
+        </div>
+
+        <div class="dm-footer">
+          <div class="dm-presets">
+            <span class="dm-label">Presets:</span>
+            <button class="dm-btn dm-preset-btn" data-preset="hiphop">Hip Hop</button>
+            <button class="dm-btn dm-preset-btn" data-preset="house">House</button>
+            <button class="dm-btn dm-preset-btn" data-preset="techno">Techno</button>
+            <button class="dm-btn dm-preset-btn" data-preset="jungle">Jungle</button>
+          </div>
+          <div class="dm-status" id="dm-status"></div>
+        </div>
+
+        <div class="dm-vel-popup" id="dm-vel-popup" style="display:none">
+          <label>Velocity</label>
+          <input type="range" min="0.05" max="1" step="0.01" id="dm-vel-slider">
+          <span id="dm-vel-val">80</span>
+        </div>
+      </div>`;
+  }
+
+  // ── Internal: event binding ──────────────────────────────────
+
+  _bindEvents() {
+    if (!this._el) return;
+    const root = this._el.querySelector(".dm-root");
+
+    // Play / stop
+    root.querySelector(".dm-play-btn").addEventListener("click", () => this.toggle());
+    root.querySelector(".dm-stop-btn").addEventListener("click", () => this.stop());
+
+    // BPM
+    root.querySelector(".dm-bpm-input").addEventListener("change", e => {
+      this._bpm = Math.max(20, Math.min(300, parseInt(e.target.value) || 120));
+      e.target.value = this._bpm;
+    });
+
+    // Steps
+    root.querySelector(".dm-steps-select").addEventListener("change", e => {
+      this._steps = parseInt(e.target.value);
+      const wasRunning = this._running;
+      if (wasRunning) this.stop();
+      this._el.innerHTML = this._buildHTML();
+      this._bindEvents();
+      if (wasRunning) this.start();
+    });
+
+    // Swing
+    const swingSlider = root.querySelector(".dm-swing-slider");
+    swingSlider.addEventListener("input", e => {
+      this._swing = parseInt(e.target.value);
+      root.querySelector(".dm-swing-val").textContent = this._swing + "%";
+    });
+
+    // Master vol
+    root.querySelector(".dm-master-vol").addEventListener("input", e => {
+      this._masterVol = parseFloat(e.target.value);
+      this._masterGain.gain.value = this._masterVol;
+    });
+
+    // Step buttons — click to toggle, right-click for velocity
+    root.querySelectorAll(".dm-step").forEach(btn => {
+      btn.addEventListener("click", e => this._toggleStep(e.currentTarget));
+      btn.addEventListener("contextmenu", e => {
+        e.preventDefault();
+        this._showVelPopup(e.currentTarget, e.clientX, e.clientY);
+      });
+    });
+
+    // Per-instrument volume
+    root.querySelectorAll(".dm-vol-slider").forEach(sl => {
+      sl.addEventListener("input", e => {
+        const id = e.target.dataset.instr;
+        const vol = parseFloat(e.target.value);
+        if (this._instrGains[id]) this._instrGains[id].gain.value = vol;
+        e.target.title = `Volume: ${Math.round(vol * 100)}`;
+      });
+    });
+
+    // Solo
+    root.querySelectorAll(".dm-solo-btn").forEach(btn => {
+      btn.addEventListener("click", e => {
+        e.stopPropagation();
+        const id = btn.dataset.instr;
+        const isSoloed = btn.classList.toggle("dm-soloed");
+        // mute everything else when anything is soloed
+        const anySolo = root.querySelectorAll(".dm-solo-btn.dm-soloed").length > 0;
+        DrumMachine.INSTRUMENTS.forEach(inst => {
+          const active = !anySolo || inst.id === id || root.querySelector(`.dm-solo-btn[data-instr="${inst.id}"]`)?.classList.contains("dm-soloed");
+          if (this._instrGains[inst.id]) this._instrGains[inst.id].gain.value = active
+            ? parseFloat(root.querySelector(`.dm-vol-slider[data-instr="${inst.id}"]`)?.value || 1)
+            : 0;
+        });
+      });
+    });
+
+    // Mute
+    root.querySelectorAll(".dm-mute-btn").forEach(btn => {
+      btn.addEventListener("click", e => {
+        e.stopPropagation();
+        const id = btn.dataset.instr;
+        const muted = btn.classList.toggle("dm-muted");
+        if (this._instrGains[id]) {
+          if (muted) {
+            this._instrGains[id]._savedVol = this._instrGains[id].gain.value;
+            this._instrGains[id].gain.value = 0;
+          } else {
+            this._instrGains[id].gain.value = this._instrGains[id]._savedVol ?? 1;
+          }
+        }
+      });
+    });
+
+    // Clear
+    root.querySelector(".dm-clear-btn").addEventListener("click", () => {
+      DrumMachine.INSTRUMENTS.forEach(inst => {
+        this._pattern[inst.id].forEach(c => { c.active = false; });
+      });
+      this._el.innerHTML = this._buildHTML();
+      this._bindEvents();
+      this._notify();
+    });
+
+    // Random
+    root.querySelector(".dm-random-btn").addEventListener("click", () => {
+      this._randomize();
+    });
+
+    // Bounce
+    root.querySelector(".dm-render-btn").addEventListener("click", async () => {
+      const btn = root.querySelector(".dm-render-btn");
+      btn.textContent = "…";
+      btn.disabled = true;
+      try {
+        await this.renderToBuffer();
+        this.notify("Bounced!", "success");
+      } catch (e) {
+        this.notify("Render failed: " + e.message, "error");
+      }
+      btn.textContent = "↓ Bounce";
+      btn.disabled = false;
+    });
+
+    // Presets
+    root.querySelectorAll(".dm-preset-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        this._loadPreset(btn.dataset.preset);
+      });
+    });
+
+    // Close vel popup on outside click
+    document.addEventListener("click", this._closeVelPopup.bind(this), { once: true });
+  }
+
+  _toggleStep(btn) {
+    const instr = btn.dataset.instr;
+    const step  = parseInt(btn.dataset.step, 10);
+    const cell  = this._pattern[instr][step];
+    cell.active = !cell.active;
+    const inst = DrumMachine.INSTRUMENTS.find(i => i.id === instr);
+    btn.classList.toggle("dm-on", cell.active);
+    if (cell.active) {
+      btn.style.cssText = `--dm-vel:${cell.velocity};opacity:${0.45+cell.velocity*0.55};background:${inst.color}`;
+    } else {
+      btn.style.cssText = "";
+    }
+    // preview sound on activate
+    if (cell.active && this.ctx.state !== "suspended") {
+      const ig = this._instrGains[instr];
+      const patchedCtx = new Proxy(this._ctx, {
+        get(target, key) {
+          if (key === "destination") return ig;
+          const v = target[key];
+          return typeof v === "function" ? v.bind(target) : v;
+        }
+      });
+      inst.synth(patchedCtx, this.ctx.currentTime + 0.01, cell.velocity);
+    }
+    this._notify();
+  }
+
+  _showVelPopup(btn, x, y) {
+    const popup = this._el.querySelector("#dm-vel-popup");
+    const slider = this._el.querySelector("#dm-vel-slider");
+    const val = this._el.querySelector("#dm-vel-val");
+    const instr = btn.dataset.instr;
+    const step  = parseInt(btn.dataset.step, 10);
+    const cell  = this._pattern[instr][step];
+
+    slider.value = cell.velocity;
+    val.textContent = Math.round(cell.velocity * 100);
+
+    popup.style.display = "flex";
+    popup.style.left = Math.min(x, window.innerWidth - 160) + "px";
+    popup.style.top  = Math.max(y - 60, 8) + "px";
+
+    const update = e => {
+      const v = parseFloat(e.target.value);
+      cell.velocity = v;
+      val.textContent = Math.round(v * 100);
+      const inst = DrumMachine.INSTRUMENTS.find(i => i.id === instr);
+      btn.style.opacity = 0.45 + v * 0.55;
+      if (cell.active) btn.style.background = inst.color;
+    };
+    slider.addEventListener("input", update);
+
+    setTimeout(() => {
+      document.addEventListener("click", () => {
+        popup.style.display = "none";
+        slider.removeEventListener("input", update);
+      }, { once: true });
+    }, 50);
+  }
+
+  _closeVelPopup() {
+    const popup = this._el?.querySelector("#dm-vel-popup");
+    if (popup) popup.style.display = "none";
+  }
+
+  _notify() {
+    // Framework: tell host state changed (saves with session)
+    this.emitStateChange();
+    // Legacy callback support
+    if (typeof this.onPatternChange === "function") {
+      this.onPatternChange(this.getPattern());
+    }
+  }
+
+  _setStatus(msg) {
+    // Legacy method — calls this.notify() which routes to host DAW or console
+    this.notify(msg, "info");
+    // Also update in-plugin status bar if present
+    const el = this._el?.querySelector("#dm-status");
+    if (el) { el.textContent = msg; setTimeout(() => { if (el) el.textContent = ""; }, 3000); }
+  }
+
+  // ── Presets ──────────────────────────────────────────────────
+
+  _randomize() {
+    const densities = { kick:0.2, snare:0.25, clap:0.15, hhc:0.55, hho:0.1, tom_hi:0.1, tom_mid:0.08, ride:0.12 };
+    DrumMachine.INSTRUMENTS.forEach(inst => {
+      this._pattern[inst.id].forEach((c, i) => {
+        c.active   = Math.random() < (densities[inst.id] || 0.2);
+        c.velocity = 0.5 + Math.random() * 0.5;
+      });
+    });
+    this._el.innerHTML = this._buildHTML();
+    this._bindEvents();
+    this._notify();
+  }
+
+  _loadPreset(name) {
+    const presets = {
+      hiphop: {
+        kick:    [1,0,0,0, 0,0,1,0, 1,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0],
+        snare:   [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0],
+        clap:    [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0],
+        hhc:     [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,1, 1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,1],
+        hho:     [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,1,0],
+        tom_hi:  [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0],
+        tom_mid: [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0],
+        ride:    [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0],
+        bpm: 90, swing: 30,
+      },
+      house: {
+        kick:    [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0],
+        snare:   [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0],
+        clap:    [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0],
+        hhc:     [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0],
+        hho:     [0,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,1,0],
+        tom_hi:  [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,1, 0,0,0,0],
+        tom_mid: [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 1,0,0,0],
+        ride:    [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0],
+        bpm: 128, swing: 0,
+      },
+      techno: {
+        kick:    [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0],
+        snare:   [0,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0],
+        clap:    [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0],
+        hhc:     [1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1],
+        hho:     [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,1, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,1],
+        tom_hi:  [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0],
+        tom_mid: [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0],
+        ride:    [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0],
+        bpm: 138, swing: 0,
+      },
+      jungle: {
+        kick:    [1,0,0,0, 0,0,0,0, 0,0,1,0, 0,0,0,0, 1,0,0,0, 0,0,1,0, 0,0,0,0, 0,1,0,0],
+        snare:   [0,0,0,0, 0,0,1,0, 0,0,0,0, 1,0,0,0, 0,0,0,0, 0,0,1,0, 0,0,0,0, 1,0,0,1],
+        clap:    [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0],
+        hhc:     [1,0,1,1, 0,1,0,1, 1,0,1,0, 1,1,0,1, 1,0,1,1, 0,1,0,1, 1,0,1,0, 1,1,0,1],
+        hho:     [0,0,0,0, 0,0,0,0, 0,1,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,1,0,0, 0,0,0,0],
+        tom_hi:  [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0],
+        tom_mid: [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,1,0,0, 0,0,0,0],
+        ride:    [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0],
+        bpm: 170, swing: 15,
+      },
+    };
+
+    const p = presets[name]; if (!p) return;
+    if (p.bpm)   { this._bpm = p.bpm; }
+    if (p.swing !== undefined) this._swing = p.swing;
+
+    // reset pattern and apply preset (always 32-step extended)
+    this._steps = 32;
+    DrumMachine.INSTRUMENTS.forEach(inst => {
+      const row = p[inst.id] || new Array(32).fill(0);
+      this._pattern[inst.id] = Array.from({ length: 32 }, (_, i) => ({
+        active:   !!row[i],
+        velocity: row[i] ? 0.75 + (i % 4 === 0 ? 0.15 : 0) : 0.8,
+      }));
+    });
+    const wasRunning = this._running;
+    if (wasRunning) this.stop();
+    this._el.innerHTML = this._buildHTML();
+    this._bindEvents();
+    if (wasRunning) this.start();
+    this.notify(`Loaded: ${name}`, "info");
+    this._notify();
+  }
+
+  // ── Styles ───────────────────────────────────────────────────
+
+  _injectStyles() {
+    if (document.getElementById("dm-styles")) return;
+    const style = document.createElement("style");
+    style.id = "dm-styles";
+    style.textContent = `
+      .dm-root {
+        --dm-bg:      #100c09;
+        --dm-sf:      #1a1410;
+        --dm-sf2:     #221c17;
+        --dm-sf3:     #2b2219;
+        --dm-sf4:     #342a20;
+        --dm-br:      rgba(255,107,53,.1);
+        --dm-br2:     rgba(255,107,53,.22);
+        --dm-br3:     rgba(255,107,53,.36);
+        --dm-tx:      #f0e8e2;
+        --dm-mt:      #7a6a60;
+        --dm-ac:      #ff6b35;
+        --dm-ac2:     #ff9a6c;
+        --dm-on-bg:   #ff6b35;
+        background:   var(--dm-bg);
+        color:        var(--dm-tx);
+        font-family:  'JetBrains Mono', monospace;
+        font-size:    11px;
+        border-radius:10px;
+        border:       1px solid var(--dm-br2);
+        overflow:     hidden;
+        user-select:  none;
+        min-width:    640px;
+      }
+
+      /* HEADER */
+      .dm-header {
+        display: flex; align-items: center; gap: 8px;
+        padding: 8px 12px; flex-wrap: wrap;
+        background: var(--dm-sf); border-bottom: 1px solid var(--dm-br2);
+      }
+      .dm-logo {
+        font-family: 'Syne', 'Segoe UI', sans-serif;
+        font-size: 13px; font-weight: 800; letter-spacing: 2px;
+        color: var(--dm-ac); margin-right: 4px; white-space: nowrap;
+      }
+      .dm-controls { display:flex; align-items:center; gap:6px; flex-wrap:wrap; flex:1; }
+      .dm-actions  { display:flex; gap:5px; margin-left:auto; }
+      .dm-sep { width:1px; height:18px; background:var(--dm-br2); margin:0 2px; }
+      .dm-label { color:var(--dm-mt); font-size:9px; letter-spacing:.5px; white-space:nowrap; }
+
+      /* BUTTONS */
+      .dm-btn {
+        padding: 4px 9px; border-radius: 4px; cursor: pointer; font-family:inherit;
+        font-size: 10px; font-weight: 600; border: 1px solid var(--dm-br2);
+        background: var(--dm-sf2); color: var(--dm-tx); transition: all .1s;
+        white-space: nowrap;
+      }
+      .dm-btn:hover    { background:var(--dm-sf3); border-color:var(--dm-ac); color:var(--dm-ac); }
+      .dm-btn.dm-active { background:var(--dm-ac); border-color:var(--dm-ac); color:#fff; }
+      .dm-btn:disabled { opacity:.45; cursor:not-allowed; }
+
+      /* INPUTS */
+      .dm-num-input {
+        background:var(--dm-sf2); border:1px solid var(--dm-br2); color:var(--dm-ac);
+        font-family:inherit; font-size:12px; font-weight:700;
+        width:44px; padding:3px 5px; border-radius:4px; outline:none; text-align:center;
+      }
+      .dm-select {
+        background:var(--dm-sf2); border:1px solid var(--dm-br2); color:var(--dm-tx);
+        font-family:inherit; font-size:10px; padding:3px 5px; border-radius:4px; outline:none;
+      }
+      .dm-swing-slider, .dm-master-vol {
+        -webkit-appearance:none; appearance:none;
+        height:3px; background:var(--dm-sf4); border-radius:2px; outline:none; cursor:pointer;
+        width:60px;
+      }
+      .dm-swing-slider::-webkit-slider-thumb, .dm-master-vol::-webkit-slider-thumb {
+        -webkit-appearance:none; width:10px; height:10px;
+        background:var(--dm-ac); border-radius:50%; cursor:pointer;
+      }
+      .dm-swing-val { color:var(--dm-ac2); font-size:10px; min-width:28px; }
+
+      /* GRID */
+      .dm-grid-wrap { padding: 8px 0; }
+
+      .dm-step-nums-row {
+        display: flex; align-items: center; margin-bottom: 2px;
+      }
+      .dm-row-label-spacer { width: 148px; flex-shrink: 0; }
+      .dm-vol-spacer { width: 54px; flex-shrink: 0; }
+      .dm-step-nums {
+        display: flex; flex: 1; gap: 2px; padding: 0 2px;
+      }
+      .dm-step-num {
+        flex: 1; text-align: center; font-size: 8px; color: var(--dm-mt);
+        line-height: 14px; border-radius: 2px; transition: color .08s;
+      }
+      .dm-bar-num { color: var(--dm-ac2); font-size: 9px; font-weight: 700; }
+      .dm-step-num-active { color: #fff !important; }
+
+      /* ROW */
+      .dm-row {
+        display: flex; align-items: center; padding: 2px 6px 2px 8px; gap: 4px;
+        border-bottom: 1px solid var(--dm-br); transition: background .1s;
+      }
+      .dm-row:hover { background: rgba(255,107,53,.03); }
+      .dm-row-label {
+        width: 140px; flex-shrink: 0; display: flex;
+        align-items: center; gap: 5px; padding-right: 4px;
+      }
+      .dm-instr-dot {
+        width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+      }
+      .dm-instr-name {
+        font-size: 10px; font-weight: 600; color: var(--dm-tx);
+        flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      }
+      .dm-solo-btn, .dm-mute-btn {
+        width: 17px; height: 17px; border-radius: 3px; cursor: pointer;
+        font-size: 8px; display: flex; align-items: center; justify-content: center;
+        border: 1px solid var(--dm-br2); background: var(--dm-sf3);
+        color: var(--dm-mt); transition: all .1s; font-family: inherit; flex-shrink: 0;
+      }
+      .dm-solo-btn.dm-soloed { background:#ffd166; border-color:#ffd166; color:#111; }
+      .dm-mute-btn.dm-muted  { background:#e84040; border-color:#e84040; color:#fff; }
+      .dm-solo-btn:hover, .dm-mute-btn:hover { border-color:var(--dm-ac); }
+
+      /* CELLS */
+      .dm-cells {
+        display: flex; flex: 1; gap: 2px; padding: 0 2px;
+      }
+      .dm-step {
+        flex: 1; height: 30px; border-radius: 4px; border: 1px solid var(--dm-br2);
+        background: var(--dm-sf3); cursor: pointer; transition: transform .08s, border-color .08s;
+        position: relative; overflow: hidden; padding: 0;
+      }
+      .dm-step:hover { border-color: var(--dm-ac); transform: scaleY(1.06); }
+      .dm-step.dm-group-start { margin-left: 4px; }
+      .dm-step.dm-on { border-color: transparent; }
+      .dm-step.dm-playing::after {
+        content: ''; position: absolute; inset: 0;
+        background: rgba(255,255,255,.35); border-radius: 3px;
+        animation: dm-flash .08s ease-out forwards;
+      }
+      @keyframes dm-flash {
+        from { opacity: 1; }
+        to   { opacity: 0; }
+      }
+
+      /* VOL SLIDER */
+      .dm-row-vol { width: 50px; flex-shrink: 0; display: flex; align-items: center; padding-left: 4px; }
+      .dm-vol-slider {
+        -webkit-appearance: none; appearance: none; width: 100%;
+        height: 2px; background: var(--dm-sf4); border-radius: 2px; outline: none; cursor: pointer;
+      }
+      .dm-vol-slider::-webkit-slider-thumb {
+        -webkit-appearance: none; width: 8px; height: 8px;
+        background: var(--dm-ac); border-radius: 50%; cursor: pointer;
+      }
+
+      /* FOOTER */
+      .dm-footer {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 6px 12px; background: var(--dm-sf); border-top: 1px solid var(--dm-br);
+        flex-wrap: wrap; gap: 6px;
+      }
+      .dm-presets { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+      .dm-status  { font-size: 10px; color: var(--dm-ac2); }
+
+      /* VELOCITY POPUP */
+      .dm-vel-popup {
+        position: fixed; z-index: 9999;
+        background: var(--dm-sf2); border: 1px solid var(--dm-br3); border-radius: 7px;
+        padding: 8px 12px; display: flex; align-items: center; gap: 8px;
+        box-shadow: 0 8px 28px rgba(0,0,0,.55); font-size: 10px; color: var(--dm-tx);
+      }
+      #dm-vel-slider {
+        -webkit-appearance: none; appearance: none; width: 90px; height: 3px;
+        background: var(--dm-sf4); border-radius: 2px; outline: none; cursor: pointer;
+        accent-color: var(--dm-ac);
+      }
+      #dm-vel-slider::-webkit-slider-thumb {
+        -webkit-appearance:none; width:10px; height:10px;
+        background:var(--dm-ac); border-radius:50%; cursor:pointer;
+      }
+      #dm-vel-val { color:var(--dm-ac); min-width:22px; text-align:right; font-weight:700; }
+
+      /* RESPONSIVE */
+      @media (max-width: 700px) {
+        .dm-root     { min-width: unset; font-size: 10px; }
+        .dm-step     { height: 24px; }
+        .dm-controls { gap: 4px; }
+        .dm-logo     { font-size: 11px; }
+        .dm-row-label { width: 110px; }
+        .dm-row-label-spacer { width: 114px; }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+}
+
+// ── Export ───────────────────────────────────────────────────
+// Requires WavrPlugin to be defined (window.WavrPlugin or imported).
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = DrumMachine;
+} else if (typeof window !== "undefined") {
+  window.DrumMachine = DrumMachine;
+}
+
+
+// ── Demo harness ──────────────────────────────────────────────
+(function() {
+  const logList    = document.getElementById('log-list');
+  const bounceList = document.getElementById('bounce-list');
+  const statusEl   = document.getElementById('plugin-status');
+  let bounceCount  = 0;
+  let previewCtx   = null;
+  let previewSrc   = null;
+
+  function ts() {
+    const n = new Date();
+    return n.getHours().toString().padStart(2,'0')+':'+
+           n.getMinutes().toString().padStart(2,'0')+':'+
+           n.getSeconds().toString().padStart(2,'0');
+  }
+
+  function log(msg, type) {
+    type = type || '';
+    const d = document.createElement('div');
+    d.className = 'log-entry';
+    d.innerHTML = '<span class="log-ts">'+ts()+'</span><span class="log-msg '+type+'">'+msg+'</span>';
+    logList.insertBefore(d, logList.firstChild);
+    if (logList.children.length > 80) logList.removeChild(logList.lastChild);
+  }
+
+  function encodeWAV(ab) {
+    const nc=ab.numberOfChannels,SR=ab.sampleRate,nf=ab.length;
+    const ba=nc*2,br=SR*ba,ds=nf*ba;
+    const buf=new ArrayBuffer(44+ds);const v=new DataView(buf);
+    function ws(o,s){for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i));}
+    ws(0,'RIFF');v.setUint32(4,36+ds,true);ws(8,'WAVE');ws(12,'fmt ');
+    v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,nc,true);
+    v.setUint32(24,SR,true);v.setUint32(28,br,true);v.setUint16(32,ba,true);
+    v.setUint16(34,16,true);ws(36,'data');v.setUint32(40,ds,true);
+    let off=44;const ch=[];for(let c=0;c<nc;c++)ch.push(ab.getChannelData(c));
+    for(let i=0;i<nf;i++)for(let c=0;c<nc;c++){
+      const s=Math.max(-1,Math.min(1,ch[c][i]));
+      v.setInt16(off,s<0?s*0x8000:s*0x7fff,true);off+=2;
+    }
+    return buf;
+  }
+
+  function addBounce(buf, bpm) {
+    bounceCount++;
+    statusEl.textContent = 'Bounced #' + bounceCount;
+    setTimeout(() => { statusEl.textContent = 'Running'; }, 2000);
+
+    const empty = bounceList.querySelector('.bounce-empty');
+    if (empty) empty.remove();
+
+    const dur = buf.duration.toFixed(2);
+    const label = bpm + ' BPM · ' + dur + 's · #' + bounceCount;
+
+    const item = document.createElement('div');
+    item.className = 'bounce-item';
+
+    const nameEl = document.createElement('span');
+    nameEl.className = 'bounce-name';
+    nameEl.textContent = label;
+
+    const durEl = document.createElement('span');
+    durEl.className = 'bounce-dur';
+    durEl.textContent = dur+'s';
+
+    const playBtn = document.createElement('button');
+    playBtn.className = 'bi-btn bi-play';
+    playBtn.textContent = '▶';
+    playBtn.addEventListener('click', function() {
+      if (previewSrc) {
+        try { previewSrc.stop(); } catch(e) {}
+        if (previewCtx) { previewCtx.close(); previewCtx = null; }
+        previewSrc = null;
+        document.querySelectorAll('.bi-play.active').forEach(b => b.classList.remove('active'));
+        if (playBtn.classList.contains('active')) { return; }
+      }
+      previewCtx = new (window.AudioContext || window.webkitAudioContext)();
+      previewCtx.resume().then(() => {
+        previewSrc = previewCtx.createBufferSource();
+        previewSrc.buffer = buf; previewSrc.loop = true;
+        previewSrc.connect(previewCtx.destination); previewSrc.start();
+        playBtn.classList.add('active'); playBtn.textContent = '■';
+        previewSrc.onended = () => { playBtn.classList.remove('active'); playBtn.textContent = '▶'; };
+      });
+    });
+
+    const dlBtn = document.createElement('button');
+    dlBtn.className = 'bi-btn bi-dl';
+    dlBtn.textContent = '↓';
+    dlBtn.addEventListener('click', () => {
+      const wav = encodeWAV(buf);
+      const blob = new Blob([wav], { type:'audio/wav' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href=url; a.download='drum-loop-'+bounceCount+'.wav'; a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 8000);
+      log('Downloaded drum-loop-'+bounceCount+'.wav', 'action');
+    });
+
+    item.appendChild(nameEl); item.appendChild(durEl); item.appendChild(playBtn); item.appendChild(dlBtn);
+    bounceList.insertBefore(item, bounceList.firstChild);
+    while (bounceList.children.length > 6) bounceList.removeChild(bounceList.lastChild);
+
+    // Switch to bounces tab
+    document.querySelector('[data-tab="bounces"]').click();
+  }
+
+  // Build minimal hostAPI for standalone demo
+  const mockHostAPI = {
+    get audioContext() {
+      if (!window._demoCtx) window._demoCtx = new (window.AudioContext || window.webkitAudioContext)();
+      return window._demoCtx;
+    },
+    get bpm() { return 120; },
+    onRender(buf, bpm, label) { addBounce(buf, bpm); log('Bounce: '+label+' — '+buf.duration.toFixed(2)+'s @ '+bpm+' BPM', 'bounce'); },
+    onStateChange(state) { log('State updated — pattern saved', 'event'); },
+    onNotify(msg, level) {
+      log(msg, level==='error'?'error':level==='success'?'bounce':'event');
+      statusEl.textContent = msg;
+      setTimeout(() => statusEl.textContent = 'Running', 2000);
+    },
+    addTrack(name) { log('Track created: '+name, 'action'); return { id:'demo', clips:[] }; },
+    getPlayhead() { return { beat:0, isPlaying:false, contextTime:0 }; },
+    getTracks() { return []; },
+  };
+
+  // Mount the plugin
+  const dm = new DrumMachine(mockHostAPI, {});
+  dm.onPatternChange = (pattern) => {
+    const active = Object.values(pattern.pattern).reduce((n,row) => n + row.filter(c=>c.active).length, 0);
+    log('Pattern: '+active+' steps active @ '+pattern.bpm+' BPM', 'event');
+  };
+  dm.onStepTick = (step) => {
+    if (step === 0) statusEl.textContent = 'Playing ▶ bar';
+  };
+
+  const mount = document.getElementById('plugin-mount');
+  dm.mount(mount);
+
+  log('DrumMachine v2.0 loaded', 'event');
+  log('8 instruments · 16 steps · 120 BPM', 'event');
+
+  // Tabs
+  document.querySelectorAll('.sb-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.sb-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.sb-pane').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('pane-'+tab.dataset.tab).classList.add('active');
+    });
+  });
+
+})();
+</script>
+</body>
+</html>

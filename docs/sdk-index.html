@@ -1,0 +1,1004 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>WAVR Plugin SDK — Build Browser Audio Plugins</title>
+    <meta
+      name="description"
+      content="An open SDK for building VST-style audio plugins in pure JavaScript for WAVR PRO — the browser DAW. Zero dependencies. No build step."
+    />
+    <meta property="og:title" content="WAVR Plugin SDK" />
+    <meta
+      property="og:description"
+      content="Build instruments, effects, and generators for WAVR PRO. Pure JavaScript. Zero dependencies."
+    />
+    <meta property="og:type" content="website" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* ── Reset & root ──────────────────────────────────────────── */
+      *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+      :root{
+        --bg:    #080810;
+        --sf:    #0f0f1a;
+        --sf2:   #161624;
+        --sf3:   #1e1e30;
+        --warm:  #100c09;
+        --warm2: #1a1410;
+        --warm3: #221c17;
+        --tx:    #f0e8e2;
+        --mt:    #7a6a60;
+        --dim:   #3a3228;
+        --ac:    #ff6b35;
+        --ac2:   #ff9a6c;
+        --ac3:   #ffd166;
+        --tl:    #00cec9;
+        --gn:    #52d9a0;
+        --br:    rgba(255,107,53,.1);
+        --br2:   rgba(255,107,53,.22);
+        --br3:   rgba(255,107,53,.4);
+      }
+      html{scroll-behavior:smooth}
+      body{
+        background:var(--bg);color:var(--tx);
+        font-family:'JetBrains Mono',monospace;
+        font-size:14px;line-height:1.7;
+        overflow-x:hidden;
+        -webkit-font-smoothing:antialiased;
+      }
+
+      /* ── Noise texture overlay ─────────────────────────────────── */
+      body::before{
+        content:'';position:fixed;inset:0;
+        background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+        pointer-events:none;z-index:0;opacity:.4;
+      }
+
+      /* ── Nav ───────────────────────────────────────────────────── */
+      nav{
+        position:fixed;top:0;left:0;right:0;z-index:100;
+        display:flex;align-items:center;justify-content:space-between;
+        padding:14px 48px;
+        background:rgba(8,8,16,.85);
+        backdrop-filter:blur(12px);
+        border-bottom:1px solid var(--br);
+      }
+      .nav-logo{
+        font-family:'Syne',sans-serif;font-size:17px;font-weight:800;
+        letter-spacing:3px;color:var(--ac);text-decoration:none;
+        display:flex;align-items:center;gap:8px;
+      }
+      .nav-logo span{font-size:9px;font-weight:600;color:var(--mt);letter-spacing:1px;font-family:'JetBrains Mono',monospace;margin-top:2px}
+      .nav-links{display:flex;align-items:center;gap:6px}
+      .nav-link{
+        padding:6px 14px;border-radius:5px;text-decoration:none;
+        font-size:11px;letter-spacing:.5px;color:var(--mt);
+        transition:color .15s,background .15s;
+      }
+      .nav-link:hover{color:var(--tx);background:rgba(255,255,255,.05)}
+      .nav-cta{
+        padding:7px 16px;border-radius:5px;text-decoration:none;
+        font-size:11px;font-weight:700;letter-spacing:.5px;
+        background:var(--ac);color:#fff;
+        border:1px solid var(--ac);
+        transition:opacity .15s;
+      }
+      .nav-cta:hover{opacity:.82}
+
+      /* ── Hero ──────────────────────────────────────────────────── */
+      #hero{
+        position:relative;min-height:100vh;
+        display:flex;flex-direction:column;justify-content:center;
+        padding:120px 48px 80px;overflow:hidden;
+      }
+      .hero-bg-canvas{
+        position:absolute;inset:0;z-index:0;opacity:.18;
+      }
+      .hero-grid{
+        position:absolute;inset:0;z-index:0;opacity:.06;
+        background-image:
+          linear-gradient(var(--br2) 1px, transparent 1px),
+          linear-gradient(90deg, var(--br2) 1px, transparent 1px);
+        background-size:60px 60px;
+      }
+      .hero-inner{position:relative;z-index:1;max-width:900px}
+      .hero-tag{
+        display:inline-flex;align-items:center;gap:8px;
+        border:1px solid var(--br2);border-radius:20px;
+        padding:5px 14px;margin-bottom:32px;
+        font-size:10px;letter-spacing:1.5px;color:var(--ac2);
+        background:rgba(255,107,53,.06);
+      }
+      .hero-tag::before{content:'⬡';font-size:11px}
+      .hero-h1{
+        font-family:'Syne',sans-serif;
+        font-size:clamp(52px,8vw,96px);
+        font-weight:800;line-height:.95;
+        letter-spacing:-2px;
+        margin-bottom:8px;
+      }
+      .hero-h1 .line1{display:block;color:var(--tx)}
+      .hero-h1 .line2{
+        display:block;
+        -webkit-text-stroke:1px var(--ac);
+        color:transparent;
+      }
+      .hero-h1 .line3{display:block;color:var(--ac)}
+      .hero-sub{
+        font-size:16px;color:var(--mt);max-width:540px;
+        margin:28px 0 44px;line-height:1.8;
+        font-family:'JetBrains Mono',monospace;font-weight:300;
+      }
+      .hero-sub strong{color:var(--ac2);font-weight:600}
+      .hero-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+      .btn-primary{
+        padding:13px 28px;border-radius:7px;text-decoration:none;
+        font-family:'Syne',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;
+        background:var(--ac);color:#fff;
+        border:2px solid var(--ac);
+        transition:all .15s;display:inline-flex;align-items:center;gap:8px;
+      }
+      .btn-primary:hover{background:transparent;color:var(--ac)}
+      .btn-secondary{
+        padding:13px 28px;border-radius:7px;text-decoration:none;
+        font-family:'Syne',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;
+        color:var(--tx);
+        border:1px solid var(--br2);
+        background:rgba(255,255,255,.03);
+        transition:all .15s;display:inline-flex;align-items:center;gap:8px;
+      }
+      .btn-secondary:hover{border-color:var(--ac);color:var(--ac);background:rgba(255,107,53,.04)}
+      .hero-stat-row{
+        display:flex;gap:40px;margin-top:56px;flex-wrap:wrap;
+        padding-top:40px;border-top:1px solid var(--br);
+      }
+      .hero-stat-num{
+        font-family:'Syne',sans-serif;font-size:32px;font-weight:800;
+        color:var(--ac);line-height:1;
+      }
+      .hero-stat-label{font-size:10px;color:var(--mt);letter-spacing:1px;margin-top:4px}
+      .hero-scroll-hint{
+        position:absolute;bottom:32px;left:50%;transform:translateX(-50%);
+        font-size:10px;color:var(--mt);letter-spacing:2px;
+        display:flex;flex-direction:column;align-items:center;gap:8px;
+        animation:bounce-hint 2s ease-in-out infinite;
+      }
+      @keyframes bounce-hint{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(6px)}}
+      .hero-scroll-arrow{font-size:14px;color:var(--ac)}
+
+      /* ── Section base ──────────────────────────────────────────── */
+      section{position:relative;padding:100px 48px;z-index:1}
+      .section-tag{
+        font-size:10px;letter-spacing:2px;color:var(--ac);
+        margin-bottom:14px;display:flex;align-items:center;gap:8px;
+      }
+      .section-tag::before{content:'';width:24px;height:1px;background:var(--ac)}
+      .section-h{
+        font-family:'Syne',sans-serif;
+        font-size:clamp(32px,4vw,52px);font-weight:800;
+        line-height:1.05;letter-spacing:-1px;margin-bottom:16px;
+      }
+      .section-sub{font-size:14px;color:var(--mt);max-width:560px;line-height:1.8}
+
+      /* ── What section ──────────────────────────────────────────── */
+      #what{background:var(--warm)}
+      .what-grid{
+        display:grid;grid-template-columns:1fr 1fr;gap:2px;
+        margin-top:60px;border:1px solid var(--br2);border-radius:12px;overflow:hidden;
+      }
+      .what-card{
+        padding:36px;background:var(--warm2);
+        border-right:1px solid var(--br);border-bottom:1px solid var(--br);
+        transition:background .2s;
+      }
+      .what-card:nth-child(even){border-right:none}
+      .what-card:nth-last-child(-n+2){border-bottom:none}
+      .what-card:hover{background:var(--warm3)}
+      .wc-icon{font-size:22px;margin-bottom:16px;color:var(--ac)}
+      .wc-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:10px;color:var(--tx)}
+      .wc-body{font-size:12px;color:var(--mt);line-height:1.8}
+      .wc-body code{color:var(--ac2);background:rgba(255,107,53,.1);padding:1px 5px;border-radius:3px;font-size:11px}
+
+      /* ── Code section ──────────────────────────────────────────── */
+      #code{background:var(--bg)}
+      .code-layout{
+        display:grid;grid-template-columns:1fr 1.1fr;gap:60px;
+        align-items:start;margin-top:60px;
+      }
+      .code-steps{display:flex;flex-direction:column;gap:28px}
+      .code-step{
+        display:flex;gap:18px;align-items:flex-start;
+        padding:20px;border-radius:8px;
+        border:1px solid transparent;
+        transition:border-color .2s,background .2s;cursor:default;
+      }
+      .code-step:hover{border-color:var(--br2);background:rgba(255,107,53,.03)}
+      .step-num{
+        width:28px;height:28px;border-radius:50%;
+        border:1px solid var(--ac);color:var(--ac);
+        font-family:'Syne',sans-serif;font-size:12px;font-weight:700;
+        display:flex;align-items:center;justify-content:center;
+        flex-shrink:0;margin-top:2px;
+      }
+      .step-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:5px}
+      .step-body{font-size:12px;color:var(--mt);line-height:1.7}
+      .step-body code{color:var(--ac2);font-size:11px}
+      pre.code-block{
+        background:var(--warm);border:1px solid var(--br2);border-radius:10px;
+        padding:28px;font-size:11.5px;line-height:1.8;overflow-x:auto;
+        color:#c8bfb8;font-family:'JetBrains Mono',monospace;
+        position:sticky;top:90px;
+      }
+      pre.code-block::-webkit-scrollbar{height:3px}
+      pre.code-block::-webkit-scrollbar-thumb{background:var(--dim);border-radius:2px}
+      .tok-kw{color:#ff9a6c}
+      .tok-cls{color:#ffd166}
+      .tok-fn{color:#52d9a0}
+      .tok-str{color:#a29bfe}
+      .tok-cm{color:#4a3c34;font-style:italic}
+      .tok-num{color:#ff6b35}
+      .tok-prop{color:#ffcba4}
+
+      /* ── Plugin showcase ───────────────────────────────────────── */
+      #plugins{background:var(--warm)}
+      .plugins-grid{
+        display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+        gap:2px;margin-top:60px;
+      }
+      .plugin-card{
+        background:var(--warm2);padding:32px;
+        border:1px solid var(--br);
+        border-radius:0;transition:all .2s;
+        position:relative;overflow:hidden;
+      }
+      .plugin-card:first-child{border-radius:10px 0 0 0}
+      .plugin-card:nth-child(3){border-radius:0 10px 0 0}
+      .plugin-card:nth-last-child(1){border-radius:0 0 10px 10px}
+      .plugin-card::before{
+        content:'';position:absolute;top:0;left:0;right:0;height:2px;
+        background:var(--ac);transform:scaleX(0);transform-origin:left;
+        transition:transform .3s;
+      }
+      .plugin-card:hover::before{transform:scaleX(1)}
+      .plugin-card:hover{background:var(--warm3);border-color:var(--br2)}
+      .pc-badge{
+        display:inline-block;font-size:8px;letter-spacing:1.5px;
+        padding:3px 8px;border-radius:3px;margin-bottom:14px;
+        background:rgba(255,107,53,.1);color:var(--ac);border:1px solid var(--br2);
+      }
+      .pc-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:8px}
+      .pc-desc{font-size:12px;color:var(--mt);line-height:1.7;margin-bottom:20px}
+      .pc-features{display:flex;flex-direction:column;gap:5px;margin-bottom:24px}
+      .pc-feat{font-size:11px;color:var(--mt);display:flex;align-items:center;gap:8px}
+      .pc-feat::before{content:'—';color:var(--ac);font-size:10px}
+      .pc-link{
+        font-size:11px;color:var(--ac);text-decoration:none;letter-spacing:.5px;
+        display:inline-flex;align-items:center;gap:6px;
+        border-bottom:1px solid var(--br2);padding-bottom:3px;
+        transition:border-color .15s,color .15s;
+      }
+      .pc-link:hover{color:var(--ac2);border-color:var(--ac2)}
+
+      /* ── API ───────────────────────────────────────────────────── */
+      #api{background:var(--bg)}
+      .api-cols{
+        display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:60px;
+      }
+      .api-group{
+        background:var(--warm);border:1px solid var(--br2);border-radius:10px;
+        overflow:hidden;
+      }
+      .api-group-head{
+        padding:16px 20px;border-bottom:1px solid var(--br2);
+        display:flex;align-items:center;gap:10px;
+      }
+      .api-group-icon{font-size:14px}
+      .api-group-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700}
+      .api-group-tag{font-size:9px;color:var(--mt);letter-spacing:1px;margin-left:auto}
+      .api-rows{padding:8px 0}
+      .api-row{
+        display:flex;flex-direction:column;
+        padding:10px 20px;border-bottom:1px solid var(--br);
+        transition:background .1s;
+      }
+      .api-row:last-child{border-bottom:none}
+      .api-row:hover{background:rgba(255,107,53,.03)}
+      .api-sig{font-size:11px;color:var(--ac2);font-family:'JetBrains Mono',monospace;margin-bottom:3px}
+      .api-desc{font-size:11px;color:var(--mt);line-height:1.5}
+
+      /* ── Community ─────────────────────────────────────────────── */
+      #community{
+        background:var(--warm);
+        border-top:1px solid var(--br2);
+      }
+      .community-inner{
+        max-width:720px;margin:0 auto;text-align:center;
+      }
+      .community-inner .section-tag{justify-content:center}
+      .community-inner .section-tag::before{display:none}
+      .community-cta-row{display:flex;gap:12px;justify-content:center;margin-top:36px;flex-wrap:wrap}
+      .checklist{
+        display:grid;grid-template-columns:1fr 1fr;gap:10px;
+        margin:40px 0;text-align:left;
+      }
+      .check-item{
+        display:flex;align-items:flex-start;gap:10px;
+        font-size:12px;color:var(--mt);
+        background:var(--warm2);border:1px solid var(--br);
+        border-radius:7px;padding:12px 14px;
+      }
+      .check-icon{color:var(--gn);font-size:13px;flex-shrink:0;margin-top:1px}
+
+      /* ── Footer ────────────────────────────────────────────────── */
+      footer{
+        padding:40px 48px;
+        border-top:1px solid var(--br);
+        display:flex;align-items:center;justify-content:space-between;
+        flex-wrap:wrap;gap:16px;
+      }
+      .footer-logo{font-family:'Syne',sans-serif;font-size:13px;font-weight:800;letter-spacing:2px;color:var(--ac)}
+      .footer-links{display:flex;gap:20px}
+      .footer-link{font-size:11px;color:var(--mt);text-decoration:none;transition:color .15s}
+      .footer-link:hover{color:var(--ac)}
+      .footer-copy{font-size:10px;color:var(--dim)}
+
+      /* ── Waveform animation ────────────────────────────────────── */
+      .waveform-bars{
+        display:flex;align-items:flex-end;gap:3px;height:60px;
+      }
+      .wb{
+        width:3px;background:var(--ac);border-radius:2px;
+        animation:wb-pulse var(--d,1s) ease-in-out infinite alternate;
+        opacity:.6;
+      }
+      @keyframes wb-pulse{from{transform:scaleY(.15)}to{transform:scaleY(1)}}
+
+      /* ── Marquee ───────────────────────────────────────────────── */
+      .marquee-wrap{overflow:hidden;padding:20px 0;border-top:1px solid var(--br);border-bottom:1px solid var(--br);margin:60px -48px}
+      .marquee-inner{display:flex;gap:40px;animation:marquee 28s linear infinite;white-space:nowrap}
+      @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+      .marquee-item{font-size:11px;color:var(--dim);letter-spacing:2px;display:flex;align-items:center;gap:12px}
+      .marquee-item::after{content:'⬡';color:var(--ac);font-size:9px}
+
+      /* ── Scroll reveal ─────────────────────────────────────────── */
+      .reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
+      .reveal.visible{opacity:1;transform:none}
+
+      /* ── Responsive ────────────────────────────────────────────── */
+      @media(max-width:900px){
+        nav{padding:12px 20px}
+        .nav-links .nav-link{display:none}
+        #hero{padding:100px 20px 60px}
+        section{padding:60px 20px}
+        .what-grid{grid-template-columns:1fr}
+        .code-layout{grid-template-columns:1fr}
+        pre.code-block{position:static}
+        .api-cols{grid-template-columns:1fr}
+        .checklist{grid-template-columns:1fr}
+        footer{padding:28px 20px}
+        .marquee-wrap{margin:40px -20px}
+        .hero-stat-row{gap:24px}
+      }
+      @media(max-width:600px){
+        .plugins-grid{grid-template-columns:1fr}
+        .plugin-card{border-radius:0 !important}
+        .plugin-card:first-child{border-radius:10px 10px 0 0 !important}
+        .plugin-card:last-child{border-radius:0 0 10px 10px !important}
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ── NAV ─────────────────────────────────────────────────── -->
+    <nav>
+      <a href="index.html" class="nav-logo">WAVR<span>PLUGIN SDK</span></a>
+      <div class="nav-links">
+        <a href="#what" class="nav-link">What</a>
+        <a href="#code" class="nav-link">How it works</a>
+        <a href="#plugins" class="nav-link">Plugins</a>
+        <a href="#api" class="nav-link">API</a>
+        <a href="#community" class="nav-link">Community</a>
+        <a href="demo.html" class="nav-cta">Live Demo →</a>
+      </div>
+    </nav>
+
+    <!-- ── HERO ────────────────────────────────────────────────── -->
+    <section id="hero">
+      <div class="hero-bg-canvas">
+        <canvas id="hero-canvas"></canvas>
+      </div>
+      <div class="hero-grid"></div>
+      <div class="hero-inner">
+        <div class="hero-tag">OPEN SDK · BROWSER DAW EXTENSIONS</div>
+        <h1 class="hero-h1">
+          <span class="line1">BUILD</span>
+          <span class="line2">AUDIO</span>
+          <span class="line3">PLUGINS.</span>
+        </h1>
+        <p class="hero-sub">
+          Extend <strong>WAVR PRO</strong> with instruments, effects, and
+          generators. Pure JavaScript. Zero dependencies. No build step. Runs
+          entirely in the browser.
+        </p>
+        <div class="hero-actions">
+          <a href="demo.html" class="btn-primary">⬡ Try the demo</a>
+          <a href="https://github.com" class="btn-secondary">↓ Download SDK</a>
+          <a href="#code" class="btn-secondary">Read the docs →</a>
+        </div>
+        <div class="hero-stat-row">
+          <div>
+            <div class="hero-stat-num">3</div>
+            <div class="hero-stat-label">SDK FILES</div>
+          </div>
+          <div>
+            <div class="hero-stat-num">0</div>
+            <div class="hero-stat-label">DEPENDENCIES</div>
+          </div>
+          <div>
+            <div class="hero-stat-num">8</div>
+            <div class="hero-stat-label">SYNTH INSTRUMENTS</div>
+          </div>
+          <div>
+            <div class="hero-stat-num">∞</div>
+            <div class="hero-stat-label">PLUGINS POSSIBLE</div>
+          </div>
+        </div>
+      </div>
+      <div class="hero-scroll-hint">
+        SCROLL
+        <div class="hero-scroll-arrow">↓</div>
+      </div>
+    </section>
+
+    <!-- ── MARQUEE ──────────────────────────────────────────────── -->
+    <div class="marquee-wrap">
+      <div class="marquee-inner">
+        <span class="marquee-item">DRUM MACHINE</span>
+        <span class="marquee-item">ARPEGGIATOR</span>
+        <span class="marquee-item">CHORD PADS</span>
+        <span class="marquee-item">STEP SEQUENCER</span>
+        <span class="marquee-item">GRANULAR SYNTH</span>
+        <span class="marquee-item">REVERB ENGINE</span>
+        <span class="marquee-item">SAMPLE SLICER</span>
+        <span class="marquee-item">BEAT GENERATOR</span>
+        <span class="marquee-item">MIDI TO AUDIO</span>
+        <span class="marquee-item">LOOPER</span>
+        <span class="marquee-item">DRUM MACHINE</span>
+        <span class="marquee-item">ARPEGGIATOR</span>
+        <span class="marquee-item">CHORD PADS</span>
+        <span class="marquee-item">STEP SEQUENCER</span>
+        <span class="marquee-item">GRANULAR SYNTH</span>
+        <span class="marquee-item">REVERB ENGINE</span>
+        <span class="marquee-item">SAMPLE SLICER</span>
+        <span class="marquee-item">BEAT GENERATOR</span>
+        <span class="marquee-item">MIDI TO AUDIO</span>
+        <span class="marquee-item">LOOPER</span>
+      </div>
+    </div>
+
+    <!-- ── WHAT ─────────────────────────────────────────────────── -->
+    <section id="what">
+      <div class="section-tag">WHAT IS THIS</div>
+      <h2 class="section-h reveal">
+        A plugin system<br />for the browser DAW.
+      </h2>
+      <p class="section-sub reveal">
+        WAVR PRO is a full-featured DAW running entirely in the browser. This
+        SDK gives anyone the tools to extend it — instruments, effects,
+        generators, anything you can synthesize with Web Audio.
+      </p>
+
+      <div class="what-grid reveal">
+        <div class="what-card">
+          <div class="wc-icon">◈</div>
+          <div class="wc-title">Extend without forking</div>
+          <div class="wc-body">
+            Plugins load at runtime from a single <code>.js</code> file. No
+            touching the DAW source. No pull requests required to ship a new
+            instrument.
+          </div>
+        </div>
+        <div class="what-card">
+          <div class="wc-icon">⬡</div>
+          <div class="wc-title">Pure JavaScript contract</div>
+          <div class="wc-body">
+            Extend <code>WavrPlugin</code>, implement four methods, use the
+            provided helpers. The host handles the chrome, session save/load,
+            and transport sync for you.
+          </div>
+        </div>
+        <div class="what-card">
+          <div class="wc-icon">◎</div>
+          <div class="wc-title">Bounce to track</div>
+          <div class="wc-body">
+            Call <code>this.emitBuffer(audioBuffer)</code> and your plugin's
+            output lands on a new DAW track instantly. No glue code, no wiring,
+            one line.
+          </div>
+        </div>
+        <div class="what-card">
+          <div class="wc-icon">↻</div>
+          <div class="wc-title">State lives with the session</div>
+          <div class="wc-body">
+            Return your state from <code>getState()</code> and it's
+            automatically saved to IndexedDB with the session. Restored on load.
+            Zero config.
+          </div>
+        </div>
+        <div class="what-card">
+          <div class="wc-icon">▶</div>
+          <div class="wc-title">Transport-aware</div>
+          <div class="wc-body">
+            Override <code>onTransportStart</code>,
+            <code>onTransportStop</code>, and <code>onPlayheadTick</code> to
+            sync your sequencer or effect to the DAW playhead in real time.
+          </div>
+        </div>
+        <div class="what-card">
+          <div class="wc-icon">⚡</div>
+          <div class="wc-title">Framework-free core</div>
+          <div class="wc-body">
+            The plugin class is plain JavaScript — no React, no bundler, no
+            toolchain. Drop <code>WavrPlugin.js</code> in a
+            <code>&lt;script&gt;</code> tag and start building.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── CODE ─────────────────────────────────────────────────── -->
+    <section id="code">
+      <div class="section-tag">HOW IT WORKS</div>
+      <h2 class="section-h reveal">
+        Five methods.<br />Infinite possibilities.
+      </h2>
+      <p class="section-sub reveal">
+        The entire plugin contract fits in a single class. Four required
+        methods, four optional transport hooks, and a handful of helpers. That's
+        the whole API surface.
+      </p>
+
+      <div class="code-layout">
+        <div class="code-steps reveal">
+          <div class="code-step">
+            <div class="step-num">1</div>
+            <div>
+              <div class="step-title">Declare your identity</div>
+              <div class="step-body">
+                Set the static metadata fields — <code>pluginId</code>,
+                <code>pluginName</code>, <code>pluginColor</code>. These tell
+                the DAW what to show in the topbar and how to style your chrome.
+              </div>
+            </div>
+          </div>
+          <div class="code-step">
+            <div class="step-num">2</div>
+            <div>
+              <div class="step-title">Build your UI in mount()</div>
+              <div class="step-body">
+                The host calls <code>mount(el)</code> with a DOM element. Build
+                your entire interface inside it. Vanilla JS, canvas, whatever
+                you like — no framework required.
+              </div>
+            </div>
+          </div>
+          <div class="code-step">
+            <div class="step-num">3</div>
+            <div>
+              <div class="step-title">Render audio &amp; emit</div>
+              <div class="step-body">
+                Use <code>OfflineAudioContext</code> to render audio offline,
+                then call <code>this.emitBuffer(buffer)</code>. The DAW places
+                it on a new track at the current playhead position.
+              </div>
+            </div>
+          </div>
+          <div class="code-step">
+            <div class="step-num">4</div>
+            <div>
+              <div class="step-title">Persist with getState / setState</div>
+              <div class="step-body">
+                Return a plain object from <code>getState()</code>. The host
+                saves it to the session automatically.
+                <code>setState()</code> is called on reload — you get your state
+                back exactly as you left it.
+              </div>
+            </div>
+          </div>
+          <div class="code-step">
+            <div class="step-num">5</div>
+            <div>
+              <div class="step-title">Register once</div>
+              <div class="step-body">
+                One <code>pluginManager.register(MyPlugin)</code> call in
+                WavrPro. The framework generates the topbar button, modal
+                chrome, and lifecycle management automatically.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <pre
+          class="code-block reveal"
+        ><span class="tok-kw">class</span> <span class="tok-cls">MyPlugin</span> <span class="tok-kw">extends</span> <span class="tok-cls">WavrPlugin</span> {
+
+  <span class="tok-cm">// ── Identity ──────────────────────────</span>
+  <span class="tok-kw">static</span> <span class="tok-prop">pluginId</span>    = <span class="tok-str">"my-plugin"</span>;
+  <span class="tok-kw">static</span> <span class="tok-prop">pluginName</span>  = <span class="tok-str">"My Plugin"</span>;
+  <span class="tok-kw">static</span> <span class="tok-prop">pluginColor</span> = <span class="tok-str">"#6c5ce7"</span>;
+  <span class="tok-kw">static</span> <span class="tok-prop">pluginMode</span>  = <span class="tok-str">"modal"</span>;
+
+  <span class="tok-fn">constructor</span>(hostAPI, options = {}) {
+    <span class="tok-kw">super</span>(hostAPI, options);
+    <span class="tok-kw">this</span>._state = { gain: <span class="tok-num">1.0</span> };
+  }
+
+  <span class="tok-cm">// ── UI ─────────────────────────────────</span>
+  <span class="tok-fn">mount</span>(el) {
+    <span class="tok-kw">this</span>._el = el;
+    el.innerHTML = <span class="tok-str">`&lt;button id="go"&gt;Bounce&lt;/button&gt;`</span>;
+    el.<span class="tok-fn">querySelector</span>(<span class="tok-str">"#go"</span>)
+      .<span class="tok-fn">addEventListener</span>(<span class="tok-str">"click"</span>, <span class="tok-kw">async</span> () => {
+        <span class="tok-kw">const</span> buf = <span class="tok-kw">await</span> <span class="tok-kw">this</span>.<span class="tok-fn">_render</span>();
+        <span class="tok-kw">this</span>.<span class="tok-fn">emitBuffer</span>(buf);      <span class="tok-cm">// → new DAW track</span>
+        <span class="tok-kw">this</span>.<span class="tok-fn">notify</span>(<span class="tok-str">"Done!"</span>, <span class="tok-str">"success"</span>);
+      });
+  }
+
+  <span class="tok-cm">// ── Cleanup ────────────────────────────</span>
+  <span class="tok-fn">destroy</span>() { <span class="tok-kw">super</span>.<span class="tok-fn">destroy</span>(); }
+
+  <span class="tok-cm">// ── State ──────────────────────────────</span>
+  <span class="tok-fn">getState</span>()  { <span class="tok-kw">return</span> { ...<span class="tok-kw">this</span>._state }; }
+  <span class="tok-fn">setState</span>(s) { <span class="tok-kw">this</span>._state = { ...<span class="tok-kw">this</span>._state, ...s }; }
+
+  <span class="tok-cm">// ── Transport hooks ────────────────────</span>
+  <span class="tok-fn">onBpmChange</span>(bpm)     { <span class="tok-kw">super</span>.<span class="tok-fn">onBpmChange</span>(bpm); }
+  <span class="tok-fn">onTransportStart</span>()  { <span class="tok-cm">/* sync sequencer */</span> }
+  <span class="tok-fn">onTransportStop</span>()   { <span class="tok-cm">/* stop sequencer */</span> }
+
+  <span class="tok-cm">// ── Audio synthesis ────────────────────</span>
+  <span class="tok-kw">async</span> <span class="tok-fn">_render</span>() {
+    <span class="tok-kw">const</span> dur = <span class="tok-kw">this</span>.<span class="tok-fn">b2s</span>(<span class="tok-num">4</span>); <span class="tok-cm">// 4 beats → seconds</span>
+    <span class="tok-kw">const</span> off = <span class="tok-kw">new</span> <span class="tok-cls">OfflineAudioContext</span>(
+      <span class="tok-num">2</span>, Math.<span class="tok-fn">ceil</span>(<span class="tok-kw">this</span>.ctx.sampleRate * dur),
+      <span class="tok-kw">this</span>.ctx.sampleRate
+    );
+    <span class="tok-cm">// ... build audio graph ...</span>
+    <span class="tok-kw">return</span> off.<span class="tok-fn">startRendering</span>();
+  }
+}</pre>
+      </div>
+    </section>
+
+    <!-- ── PLUGINS ───────────────────────────────────────────────── -->
+    <section id="plugins">
+      <div class="section-tag">INCLUDED PLUGINS</div>
+      <h2 class="section-h reveal">Ship-ready from day one.</h2>
+      <p class="section-sub reveal">
+        The SDK ships with a full-featured first-party plugin and a minimal
+        example to copy from. Both are open source.
+      </p>
+
+      <div class="plugins-grid reveal">
+        <div class="plugin-card">
+          <div class="pc-badge">INSTRUMENT</div>
+          <div class="pc-title">Drum Machine</div>
+          <div class="pc-desc">
+            A 16/32-step sequencer with 8 fully synthesized instruments.
+            Transport-synced, session-persistent, and immediately usable in WAVR
+            PRO.
+          </div>
+          <div class="pc-features">
+            <div class="pc-feat">
+              Kick, Snare, Clap, HH Open &amp; Closed, Tom Hi &amp; Mid, Ride
+            </div>
+            <div class="pc-feat">16 or 32 steps with per-step velocity</div>
+            <div class="pc-feat">Swing control 0–75%</div>
+            <div class="pc-feat">Mute, solo, and per-instrument volume</div>
+            <div class="pc-feat">4 genre presets + randomize</div>
+            <div class="pc-feat">Bounces a full loop to any DAW track</div>
+          </div>
+          <a href="demo.html" class="pc-link">Try it live →</a>
+        </div>
+
+        <div class="plugin-card">
+          <div class="pc-badge">EXAMPLE</div>
+          <div class="pc-title">Chord Pad</div>
+          <div class="pc-desc">
+            A minimal 120-line plugin showing the complete lifecycle. Pick a
+            key, pick a bar count, bounce a chord loop. The recommended starting
+            point for new plugin authors.
+          </div>
+          <div class="pc-features">
+            <div class="pc-feat">Demonstrates all four required methods</div>
+            <div class="pc-feat">Shows state persistence and BPM sync</div>
+            <div class="pc-feat">emitBuffer, emitStateChange, notify usage</div>
+            <div class="pc-feat">OfflineAudioContext synthesis pattern</div>
+          </div>
+          <a href="https://github.com" class="pc-link">View source →</a>
+        </div>
+
+        <div
+          class="plugin-card"
+          style="background:rgba(255,107,53,.03);border-style:dashed"
+        >
+          <div
+            class="pc-badge"
+            style="background:transparent;border-color:var(--br2);color:var(--mt)"
+          >
+            YOUR PLUGIN
+          </div>
+          <div class="pc-title" style="color:var(--mt)">
+            What will you build?
+          </div>
+          <div class="pc-desc" style="color:var(--dim)">
+            Arpeggiator, granular synthesizer, reverb unit, beat slicer, looper,
+            vocoder, FM synth — anything you can build with Web Audio can be a
+            WAVR plugin.
+          </div>
+          <div class="pc-features">
+            <div class="pc-feat" style="color:var(--dim)">
+              Start from ExamplePlugin.js
+            </div>
+            <div class="pc-feat" style="color:var(--dim)">
+              No dependencies to install
+            </div>
+            <div class="pc-feat" style="color:var(--dim)">
+              Submit to the community gallery
+            </div>
+          </div>
+          <a
+            href="#community"
+            class="pc-link"
+            style="color:var(--mt);border-color:var(--br)"
+            >Get started →</a
+          >
+        </div>
+      </div>
+    </section>
+
+    <!-- ── API REFERENCE ─────────────────────────────────────────── -->
+    <section id="api">
+      <div class="section-tag">API REFERENCE</div>
+      <h2 class="section-h reveal">Small surface.<br />Full control.</h2>
+      <p class="section-sub reveal">
+        The complete plugin API — what you implement, what the host gives you,
+        and what you call to send audio back.
+      </p>
+
+      <div class="api-cols reveal">
+        <div>
+          <div class="api-group" style="margin-bottom:20px">
+            <div class="api-group-head">
+              <span class="api-group-icon">◈</span>
+              <span class="api-group-title">Methods to implement</span>
+              <span class="api-group-tag">REQUIRED</span>
+            </div>
+            <div class="api-rows">
+              <div class="api-row">
+                <div class="api-sig">mount(el: HTMLElement)</div>
+                <div class="api-desc">Build UI into el. Store as this._el.</div>
+              </div>
+              <div class="api-row">
+                <div class="api-sig">destroy()</div>
+                <div class="api-desc">Clean up. Call super.destroy() last.</div>
+              </div>
+              <div class="api-row">
+                <div class="api-sig">getState() → object</div>
+                <div class="api-desc">
+                  Return JSON-serialisable plugin state.
+                </div>
+              </div>
+              <div class="api-row">
+                <div class="api-sig">setState(state: object)</div>
+                <div class="api-desc">
+                  Restore from a previous getState() snapshot.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="api-group">
+            <div class="api-group-head">
+              <span class="api-group-icon">▶</span>
+              <span class="api-group-title">Transport hooks</span>
+              <span class="api-group-tag">OPTIONAL</span>
+            </div>
+            <div class="api-rows">
+              <div class="api-row">
+                <div class="api-sig">onBpmChange(bpm: number)</div>
+                <div class="api-desc">
+                  Call super first. Keeps this.bpm in sync.
+                </div>
+              </div>
+              <div class="api-row">
+                <div class="api-sig">onTransportStart(beat, ctxTime)</div>
+                <div class="api-desc">
+                  DAW playback started at this beat position.
+                </div>
+              </div>
+              <div class="api-row">
+                <div class="api-sig">onTransportStop()</div>
+                <div class="api-desc">DAW playback stopped.</div>
+              </div>
+              <div class="api-row">
+                <div class="api-sig">onPlayheadTick(beat: number)</div>
+                <div class="api-desc">
+                  Called ~60×/sec while playing. Keep it cheap.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="api-group" style="margin-bottom:20px">
+            <div class="api-group-head">
+              <span class="api-group-icon">⬡</span>
+              <span class="api-group-title">Host-injected properties</span>
+              <span class="api-group-tag">READ ONLY</span>
+            </div>
+            <div class="api-rows">
+              <div class="api-row">
+                <div class="api-sig">this.ctx: AudioContext</div>
+                <div class="api-desc">
+                  The shared DAW audio context. Do not close it.
+                </div>
+              </div>
+              <div class="api-row">
+                <div class="api-sig">this.bpm: number</div>
+                <div class="api-desc">
+                  Current host BPM. Updated by onBpmChange().
+                </div>
+              </div>
+              <div class="api-row">
+                <div class="api-sig">this.options: object</div>
+                <div class="api-desc">
+                  Options passed at plugin registration time.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="api-group">
+            <div class="api-group-head">
+              <span class="api-group-icon">↗</span>
+              <span class="api-group-title">Helpers to call</span>
+              <span class="api-group-tag">NEVER OVERRIDE</span>
+            </div>
+            <div class="api-rows">
+              <div class="api-row">
+                <div class="api-sig">emitBuffer(buf, label?)</div>
+                <div class="api-desc">
+                  Send rendered audio to a new DAW track.
+                </div>
+              </div>
+              <div class="api-row">
+                <div class="api-sig">emitStateChange()</div>
+                <div class="api-desc">
+                  Mark session dirty. Call when state changes.
+                </div>
+              </div>
+              <div class="api-row">
+                <div class="api-sig">notify(msg, level?)</div>
+                <div class="api-desc">
+                  Show a DAW toast. Levels: info success warn error.
+                </div>
+              </div>
+              <div class="api-row">
+                <div class="api-sig">b2s(beats) / s2b(seconds)</div>
+                <div class="api-desc">
+                  Time conversion at the current host BPM.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── COMMUNITY ─────────────────────────────────────────────── -->
+    <section id="community">
+      <div class="community-inner">
+        <div class="section-tag">COMMUNITY</div>
+        <h2 class="section-h reveal">Build something.<br />Share it.</h2>
+        <p class="section-sub reveal" style="margin:0 auto">
+          We want to see what people build. Submit your plugin to the community
+          gallery — working plugins with a test page and clear description get
+          featured.
+        </p>
+
+        <div class="checklist reveal">
+          <div class="check-item">
+            <span class="check-icon">✓</span>pluginId is unique and hyphenated
+          </div>
+          <div class="check-item">
+            <span class="check-icon">✓</span>Four required methods implemented
+          </div>
+          <div class="check-item">
+            <span class="check-icon">✓</span>super.destroy() called last
+          </div>
+          <div class="check-item">
+            <span class="check-icon">✓</span>this.ctx used, not a new
+            AudioContext
+          </div>
+          <div class="check-item">
+            <span class="check-icon">✓</span>CSS classes prefixed with pluginId
+          </div>
+          <div class="check-item">
+            <span class="check-icon">✓</span>getState() returns only plain JSON
+          </div>
+        </div>
+
+        <div class="community-cta-row reveal">
+          <a href="https://github.com" class="btn-primary">Submit a plugin →</a>
+          <a href="demo.html" class="btn-secondary">Try the demo first</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── FOOTER ───────────────────────────────────────────────── -->
+    <footer>
+      <div class="footer-logo">WAVR PLUGIN SDK</div>
+      <div class="footer-links">
+        <a href="index.html" class="footer-link">Home</a>
+        <a href="demo.html" class="footer-link">Demo</a>
+        <a href="https://github.com" class="footer-link">GitHub</a>
+        <a href="https://github.com" class="footer-link">COMMUNITY.md</a>
+      </div>
+      <div class="footer-copy">MIT Licence · Built with Web Audio API</div>
+    </footer>
+
+    <script>
+      // ── Hero canvas waveform ───────────────────────────────────────
+      (function() {
+        const cvs = document.getElementById('hero-canvas');
+        if (!cvs) return;
+        const ctx = cvs.getContext('2d');
+        let W, H, points = [];
+        function resize() {
+          W = cvs.width  = cvs.offsetWidth+2000;
+          H = cvs.height = cvs.offsetHeight+80;
+          points = Array.from({length: 120}, (_, i) => ({
+            x: (i/119)*W, y: H/2,
+            vy: (Math.random()-.5)*2,
+            amp: 20+Math.random()*60,
+            freq: .008+Math.random()*.012,
+            phase: Math.random()*Math.PI*2,
+          }));
+        }
+        resize();
+        window.addEventListener('resize', resize);
+        let t = 0;
+        (function loop() {
+          ctx.clearRect(0,0,W,H);
+          t += .012;
+          ctx.strokeStyle = '#ff6b35';
+          ctx.lineWidth = 1.5;
+          ctx.globalAlpha = 1;
+          for (let pass=0; pass<3; pass++) {
+            ctx.beginPath();
+            ctx.globalAlpha = pass===0?.7:pass===1?.35:.18;
+            const offset = pass * 18;
+            points.forEach((p,i) => {
+              const y = H/2 + Math.sin(t*p.freq*80+p.phase+pass*1.2)*p.amp;
+              i===0 ? ctx.moveTo(p.x, y+offset) : ctx.lineTo(p.x, y+offset);
+            });
+            ctx.stroke();
+          }
+          requestAnimationFrame(loop);
+        })();
+      })();
+
+      // ── Scroll reveal ──────────────────────────────────────────────
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+      }, { threshold: .12 });
+      document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    </script>
+  </body>
+</html>

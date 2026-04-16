@@ -1,0 +1,32 @@
+{
+  "name": "wavr-plugin-sdk",
+  "version": "1.0.0",
+  "description": "Plugin SDK for WAVR PRO — build VST-style browser audio plugins in pure JavaScript",
+  "main": "src/WavrPlugin.js",
+  "module": "src/WavrPlugin.js",
+  "exports": {
+    ".":                     "./src/WavrPlugin.js",
+    "./WavrPlugin":          "./src/WavrPlugin.js",
+    "./PluginShell":         "./src/PluginShell.jsx",
+    "./usePluginManager":    "./src/usePluginManager.js",
+    "./plugins/DrumMachine": "./plugins/DrumMachine/DrumMachine.js"
+  },
+  "files": [
+    "src/",
+    "plugins/",
+    "examples/",
+    "README.md"
+  ],
+  "keywords": [
+    "audio", "daw", "plugin", "vst", "web-audio", "sequencer", "drum-machine", "wavr"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "react": ">=18.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": { "optional": true }
+  },
+  "devDependencies": {},
+  "dependencies": {}
+}
