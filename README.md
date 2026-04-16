@@ -234,4 +234,4 @@ See `CONTRIBUTING.md` for the full guide. Short version:
 
 ## Licence
 
-APGPL — use freely in open-source and commercial projects.
+AGPL 3.0 — use freely in open-source and commercial projects.
