@@ -59,7 +59,7 @@
       .demo-sidebar{width:280px;flex-shrink:0;background:var(--sf);border-left:1px solid var(--br2);display:flex;flex-direction:column;overflow:hidden}
 
       /* PLUGIN MOUNT */
-      .plugin-section{max-width:900px;margin:0 auto}
+      .plugin-section{max-width:100vw;margin:0 auto}
       .plugin-section-title{font-size:9px;letter-spacing:2px;color:var(--mt);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
       .plugin-status{font-size:9px;color:var(--gn)}
       #plugin-mount{border-radius:10px;overflow:hidden;border:1px solid var(--br2)}
@@ -124,6 +124,86 @@
       }
       @media(max-width:600px){.demo-meta{display:none}}
     </style>
+    <style>
+      *{box-sizing:border-box;margin:0;padding:0}
+      :root{
+        --bg:#080810;--sf:#0f0f1a;--sf2:#161624;--sf3:#1e1e30;
+        --br:rgba(255,107,53,.1);--br2:rgba(255,107,53,.22);
+        --tx:#f0e8e2;--mt:#7a6a60;--ac:#ff6b35;--ac2:#ff9a6c;
+        --tl:#ffcba4;--am:#ffd166;--gn:#52d9a0;--rd:#e84040;
+      }
+      html,body{min-height:100%;background:var(--bg);color:var(--tx);font-family:'JetBrains Mono',monospace;font-size:11px;-webkit-font-smoothing:antialiased}
+      #shell{display:flex;flex-direction:column;min-height:100vh}
+      #topbar{display:flex;align-items:center;gap:8px;padding:8px 16px;background:var(--sf);border-bottom:1px solid var(--br2);flex-wrap:wrap;flex-shrink:0}
+      .logo{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;letter-spacing:3px;color:var(--ac)}
+      .logo sub{font-size:8px;font-weight:600;color:var(--mt);letter-spacing:1px;font-family:'JetBrains Mono',monospace}
+      .sep{width:1px;height:18px;background:var(--br2);margin:0 2px}
+      .tbtn{padding:4px 10px;border-radius:5px;border:1px solid var(--br2);background:var(--sf2);color:var(--tx);font-family:inherit;font-size:10px;cursor:pointer;transition:all .12s;white-space:nowrap}
+      .tbtn:hover{background:var(--sf3);border-color:var(--ac);color:var(--ac)}
+      .tbtn.active{background:var(--ac);border-color:var(--ac);color:#fff}
+      .tbtn.green{color:var(--gn);border-color:rgba(82,217,160,.3)}
+      .tbtn.green:hover{background:rgba(82,217,160,.08);border-color:var(--gn)}
+      .bpm-wrap{display:flex;align-items:center;gap:5px;background:var(--sf2);border:1px solid var(--br2);border-radius:5px;padding:3px 8px}
+      .bpm-wrap label{color:var(--mt);font-size:9px;letter-spacing:1px}
+      #host-bpm{background:transparent;border:none;color:var(--am);font-family:inherit;font-size:13px;font-weight:700;width:36px;outline:none;text-align:center}
+      .mode-wrap{display:flex;align-items:center;gap:5px;background:var(--sf2);border:1px solid var(--br2);border-radius:5px;padding:3px 8px}
+      .mode-wrap label{color:var(--mt);font-size:9px;letter-spacing:1px}
+      #mode-select{background:transparent;border:none;color:var(--tx);font-family:inherit;font-size:10px;outline:none;cursor:pointer}
+      #content{flex:1;display:flex;gap:0;overflow:hidden}
+      #plugin-area{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow:auto}
+      #plugin-mount{width:100%;max-width:900px}
+      #sidebar{width:260px;flex-shrink:0;background:var(--sf);border-left:1px solid var(--br2);display:flex;flex-direction:column;overflow:hidden}
+      #sidebar h3{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--ac);padding:10px 12px;border-bottom:1px solid var(--br);flex-shrink:0}
+      .sidebar-section{padding:10px 12px;border-bottom:1px solid var(--br)}
+      .sidebar-section h4{font-size:9px;color:var(--mt);letter-spacing:1px;margin-bottom:8px}
+      #log-wrap{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
+      #log-wrap h4{font-size:9px;color:var(--mt);letter-spacing:1px;padding:8px 12px 4px;flex-shrink:0}
+      #log{flex:1;overflow-y:auto;padding:0 12px 8px;font-size:9px;line-height:1.7}
+      #log::-webkit-scrollbar{width:3px}
+      #log::-webkit-scrollbar-thumb{background:var(--sf3);border-radius:2px}
+      .log-entry{color:var(--mt);padding:2px 0;border-bottom:1px solid var(--br)}
+      .log-entry.event{color:var(--tl)}
+      .log-entry.action{color:var(--ac2)}
+      .log-entry.bounce{color:var(--gn)}
+      .log-entry.error{color:var(--rd)}
+      .log-time{color:var(--sf3);margin-right:6px}
+      .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+      .stat{background:var(--sf2);border-radius:5px;padding:6px 8px}
+      .stat-label{font-size:8px;color:var(--mt);margin-bottom:2px;letter-spacing:.5px}
+      .stat-val{font-size:13px;font-weight:700;color:var(--tl);font-variant-numeric:tabular-nums}
+      #pattern-json{background:var(--sf2);border:1px solid var(--br);border-radius:5px;padding:7px;font-size:8px;color:var(--mt);max-height:120px;overflow-y:auto;word-break:break-all;line-height:1.6;white-space:pre-wrap}
+      #pattern-json::-webkit-scrollbar{width:3px}
+      #pattern-json::-webkit-scrollbar-thumb{background:var(--sf3)}
+      #download-queue{max-height:110px;overflow-y:auto}
+      #download-queue::-webkit-scrollbar{width:3px}
+      #download-queue::-webkit-scrollbar-thumb{background:var(--sf3)}
+      .dl-item{display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--br);font-size:9px}
+      .dl-name{color:var(--tx);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      .dl-btn{padding:2px 7px;border-radius:3px;border:1px solid rgba(82,217,160,.3);background:transparent;color:var(--gn);font-family:inherit;font-size:8px;cursor:pointer;flex-shrink:0;margin-left:6px;transition:all .1s}
+      .dl-btn:hover{background:var(--gn);color:#0a2c1e}
+      .dl-empty{font-size:9px;color:var(--mt);padding:4px 0}
+      #modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:600;display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+      #modal-overlay.open{display:flex}
+      #modal-box{background:var(--sf);border:1px solid var(--br2);border-radius:12px;overflow:hidden;max-width:96vw;max-height:90vh;overflow-y:auto;animation:slide-up .2s cubic-bezier(.4,0,.2,1)}
+      @keyframes slide-up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+      #modal-titlebar{display:flex;align-items:center;justify-content:space-between;padding:8px 12px 0}
+      #modal-title{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;color:rgba(255,107,53,.5)}
+      #modal-close{width:24px;height:24px;border-radius:50%;border:1px solid var(--br2);background:transparent;color:var(--mt);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;transition:all .1s;font-family:inherit}
+      #modal-close:hover{background:var(--rd);border-color:var(--rd);color:#fff}
+      #drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:600;display:none;align-items:flex-end;justify-content:center}
+      #drawer-overlay.open{display:flex}
+      #drawer-box{background:var(--sf);border:1px solid var(--br2);border-radius:12px 12px 0 0;width:100%;max-height:80vh;overflow-y:auto;animation:slide-drawer .2s cubic-bezier(.4,0,.2,1)}
+      @keyframes slide-drawer{from{opacity:0;transform:translateY(32px)}to{opacity:1;transform:translateY(0)}}
+      #drawer-titlebar{display:flex;align-items:center;justify-content:space-between;padding:8px 12px 0}
+      #drawer-title{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;color:rgba(255,107,53,.5)}
+      #drawer-close{width:24px;height:24px;border-radius:50%;border:1px solid var(--br2);background:transparent;color:var(--mt);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;transition:all .1s;font-family:inherit}
+      #drawer-close:hover{background:var(--rd);border-color:var(--rd);color:#fff}
+      #notice{padding:5px 16px;font-size:10px;background:#12100a;border-bottom:1px solid rgba(255,209,102,.18);display:flex;align-items:center;gap:7px;flex-shrink:0}
+      #notice .ni{color:var(--am)}
+      #notice .nt{color:#9a8050}
+      #notice .nt strong{color:var(--am)}
+      @media(max-width:700px){#sidebar{display:none}#plugin-area{padding:10px}}
+    </style>
   </head>
   <body>
     <nav>
@@ -173,6 +253,105 @@
       <div class="demo-body">
         <div class="demo-main">
           <div class="plugin-section">
+            <!-- HOW TO USE -->
+            <div id="notice">
+              <span class="ni">⚠</span>
+              <span class="nt"
+                ><strong>Test Harness:</strong> Audio requires a user gesture
+                (browser autoplay) — click Play inside the drum machine.
+                Right-click any step for velocity. All audio synthesized
+                in-browser.</span
+              >
+            </div>
+            <div id="topbar">
+              <span class="logo">WAVR <sub>DRUM MACHINE TEST</sub></span>
+              <div class="sep"></div>
+              <div class="bpm-wrap">
+                <label>HOST BPM</label>
+                <input
+                  id="host-bpm"
+                  type="number"
+                  min="20"
+                  max="300"
+                  value="120"
+                />
+              </div>
+              <button class="tbtn" id="btn-sync-bpm">Sync BPM →</button>
+              <div class="sep"></div>
+              <div class="mode-wrap">
+                <label>MODE</label>
+                <select id="mode-select">
+                  <option value="inline">Inline</option>
+                  <option value="modal">Modal</option>
+                  <option value="drawer">Drawer</option>
+                </select>
+              </div>
+              <button class="tbtn" id="btn-open-modal" style="display:none">
+                ⬡ Open Modal
+              </button>
+              <button class="tbtn" id="btn-open-drawer" style="display:none">
+                ⬡ Open Drawer
+              </button>
+              <div class="sep"></div>
+              <button class="tbtn" id="btn-save-pattern">↓ Save Pattern</button>
+              <button class="tbtn" id="btn-load-pattern">↑ Load Pattern</button>
+              <input
+                type="file"
+                id="load-input"
+                accept=".dmpattern,.json"
+                style="display:none"
+              />
+              <div class="sep"></div>
+              <button class="tbtn green" id="btn-bounce-test">
+                ◎ Bounce Test
+              </button>
+            </div>
+            <div id="content">
+              <div id="plugin-area">
+                <div id="plugin-mount"></div>
+              </div>
+              <div id="sidebar">
+                <h3>⬡ TEST HARNESS</h3>
+                <div class="sidebar-section">
+                  <h4>LIVE STATS</h4>
+                  <div class="stat-grid">
+                    <div class="stat">
+                      <div class="stat-label">STEP</div>
+                      <div class="stat-val" id="stat-step">—</div>
+                    </div>
+                    <div class="stat">
+                      <div class="stat-label">BPM</div>
+                      <div class="stat-val" id="stat-bpm">120</div>
+                    </div>
+                    <div class="stat">
+                      <div class="stat-label">ACTIVE STEPS</div>
+                      <div class="stat-val" id="stat-active">—</div>
+                    </div>
+                    <div class="stat">
+                      <div class="stat-label">BOUNCES</div>
+                      <div class="stat-val" id="stat-buffers">0</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="sidebar-section">
+                  <h4>PATTERN SNAPSHOT</h4>
+                  <pre id="pattern-json">—</pre>
+                </div>
+                <div class="sidebar-section">
+                  <h4>BOUNCED AUDIO</h4>
+                  <div id="download-queue">
+                    <div class="dl-empty">
+                      No bounces yet — click ↓ Bounce in the plugin or ◎ Bounce
+                      Test above.
+                    </div>
+                  </div>
+                </div>
+                <div id="log-wrap">
+                  <h4>EVENT LOG</h4>
+                  <div id="log"></div>
+                </div>
+              </div>
+            </div>
             <div class="plugin-section-title">
               <span>⬡ DRUM MACHINE v2.0 · WavrPlugin</span>
               <span class="plugin-status" id="plugin-status">Ready</span>
@@ -183,148 +362,6 @@
               plugin to activate the audio context.
             </div>
             <div id="plugin-mount"></div>
-          </div>
-
-          <!-- HOW TO USE -->
-          <div
-            style="max-width:900px;margin:36px auto 0;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px"
-          >
-            <div
-              style="background:var(--warm2);border:1px solid var(--br);border-radius:8px;padding:16px"
-            >
-              <div style="font-size:18px;margin-bottom:8px">▶</div>
-              <div
-                style="font-family:Syne,sans-serif;font-size:12px;font-weight:700;margin-bottom:5px"
-              >
-                Play
-              </div>
-              <div style="font-size:11px;color:var(--mt);line-height:1.6">
-                Click Play inside the plugin to start the sequencer.
-              </div>
-            </div>
-            <div
-              style="background:var(--warm2);border:1px solid var(--br);border-radius:8px;padding:16px"
-            >
-              <div style="font-size:18px;margin-bottom:8px">⬡</div>
-              <div
-                style="font-family:Syne,sans-serif;font-size:12px;font-weight:700;margin-bottom:5px"
-              >
-                Steps
-              </div>
-              <div style="font-size:11px;color:var(--mt);line-height:1.6">
-                Click any step button to toggle it. Right-click for velocity.
-              </div>
-            </div>
-            <div
-              style="background:var(--warm2);border:1px solid var(--br);border-radius:8px;padding:16px"
-            >
-              <div style="font-size:18px;margin-bottom:8px">◎</div>
-              <div
-                style="font-family:Syne,sans-serif;font-size:12px;font-weight:700;margin-bottom:5px"
-              >
-                Bounce
-              </div>
-              <div style="font-size:11px;color:var(--mt);line-height:1.6">
-                Click ↓ Bounce to render a WAV. It appears in the sidebar.
-              </div>
-            </div>
-            <div
-              style="background:var(--warm2);border:1px solid var(--br);border-radius:8px;padding:16px"
-            >
-              <div style="font-size:18px;margin-bottom:8px">↻</div>
-              <div
-                style="font-family:Syne,sans-serif;font-size:12px;font-weight:700;margin-bottom:5px"
-              >
-                Presets
-              </div>
-              <div style="font-size:11px;color:var(--mt);line-height:1.6">
-                Try Hip Hop, House, Techno, or Jungle in the footer.
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- SIDEBAR -->
-        <div class="demo-sidebar">
-          <div style="padding:0">
-            <div class="sb-tabs">
-              <button class="sb-tab active" data-tab="log">Event Log</button>
-              <button class="sb-tab" data-tab="bounces">Bounces</button>
-              <button class="sb-tab" data-tab="code">Integration</button>
-            </div>
-          </div>
-
-          <div class="sb-pane active" id="pane-log">
-            <div class="sb-log-list" id="log-list"></div>
-          </div>
-
-          <div class="sb-pane" id="pane-bounces">
-            <div class="sb-section" style="flex:1;overflow-y:auto">
-              <div class="sb-h">BOUNCED AUDIO</div>
-              <div id="bounce-list">
-                <div class="bounce-empty">
-                  No bounces yet — click ↓ Bounce inside the plugin.
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="sb-pane" id="pane-code">
-            <div style="padding:14px 16px;overflow-y:auto;flex:1">
-              <div class="sb-h">REGISTER IN WAVR PRO</div>
-              <pre
-                class="sb-code"
-              ><span class="tok-cm2">// WavrPro.jsx — add these</span>
-<span class="tok-kw2">import</span> DrumMachine
-  <span class="tok-kw2">from</span> <span class="tok-str2">"./plugins/DrumMachine"</span>;
-
-<span class="tok-cm2">// Inside component:</span>
-<span class="tok-kw2">const</span> pm = <span class="tok-fn2">usePluginManager</span>({
-  audioCtxRef, bpmRef ...
-});
-
-<span class="tok-fn2">useEffect</span>(() => {
-  pm.<span class="tok-fn2">register</span>(DrumMachine);
-}, []);
-
-<span class="tok-cm2">// In topbar:</span>
-&lt;<span class="tok-cls2">button</span> onClick={() =>
-  pm.<span class="tok-fn2">toggle</span>(<span class="tok-str2">"drum-machine"</span>)}&gt;
-  Drums
-&lt;/<span class="tok-cls2">button</span>&gt;
-
-<span class="tok-cm2">// In JSX:</span>
-{pm.plugins.<span class="tok-fn2">filter</span>(p => p.isOpen)
-  .<span class="tok-fn2">map</span>(p => (
-  &lt;<span class="tok-cls2">PluginShell</span>
-    pluginClass={p.cls}
-    hostAPI={pm.<span class="tok-fn2">getHostAPI</span>(p.id)}
-    open={p.isOpen}
-    onClose={() =>
-      pm.<span class="tok-fn2">close</span>(p.id)}
-  /&gt;
-))}</pre>
-              <div style="margin-top:14px">
-                <div class="sb-h">STANDALONE (NO REACT)</div>
-                <pre
-                  class="sb-code"
-                >&lt;<span class="tok-cls2">script</span> src=<span class="tok-str2">"WavrPlugin.js"</span>&gt;&lt;/<span class="tok-cls2">script</span>&gt;
-&lt;<span class="tok-cls2">script</span> src=<span class="tok-str2">"DrumMachine.js"</span>&gt;&lt;/<span class="tok-cls2">script</span>&gt;
-
-<span class="tok-kw2">const</span> dm = <span class="tok-kw2">new</span> <span class="tok-cls2">DrumMachine</span>({
-  audioContext: ctx,
-  bpm: <span class="tok-str2">120</span>
-});
-
-dm.<span class="tok-fn2">onRender</span> = (buf, bpm) => {
-  <span class="tok-cm2">// got AudioBuffer</span>
-};
-
-dm.<span class="tok-fn2">mount</span>(
-  document.<span class="tok-fn2">getElementById</span>(<span class="tok-str2">"host"</span>)
-);</pre>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -339,245 +376,25 @@ dm.<span class="tok-fn2">mount</span>(
       </div>
     </div>
 
+    <div id="modal-overlay">
+      <div id="modal-box">
+        <div id="modal-titlebar">
+          <span id="modal-title">VST · DRUM MACHINE</span
+          ><button id="modal-close">✕</button>
+        </div>
+        <div id="modal-mount"></div>
+      </div>
+    </div>
+    <div id="drawer-overlay">
+      <div id="drawer-box">
+        <div id="drawer-titlebar">
+          <span id="drawer-title">VST · DRUM MACHINE</span
+          ><button id="drawer-close">✕</button>
+        </div>
+        <div id="drawer-mount"></div>
+      </div>
+    </div>
     <script>
-      /**
-       * WavrPlugin.js — Base class for all WAVR plugins
-       *
-       * Extend this class to create a plugin. Implement the required methods
-       * (mount, destroy, getState, setState) and use the provided helpers
-       * (emitBuffer, emitStateChange, notify) to communicate with the host DAW.
-       *
-       * The host injects a HostAPI object as the first constructor argument.
-       * Use this.host, this.ctx, and this.bpm to access host services.
-       *
-       * @example
-       *   class MyPlugin extends WavrPlugin {
-       *     static pluginId    = "my-plugin";
-       *     static pluginName  = "My Plugin";
-       *     static pluginColor = "#6c5ce7";
-       *     static pluginMode  = "modal";  // "modal" | "drawer" | "inline"
-       *
-       *     constructor(hostAPI, options) {
-       *       super(hostAPI, options);
-       *       this._state = { gain: 1.0 };
-       *     }
-       *
-       *     mount(el) {
-       *       this._el = el;
-       *       el.innerHTML = `<button id="go">Bounce</button>`;
-       *       el.querySelector("#go").addEventListener("click", async () => {
-       *         const buf = await this._renderSomething();
-       *         this.emitBuffer(buf);                   // → drops onto a new DAW track
-       *         this.notify("Done!", "success");
-       *       });
-       *     }
-       *
-       *     destroy() {
-       *       // stop timers, disconnect audio nodes
-       *       super.destroy();   // always call last — clears el.innerHTML
-       *     }
-       *
-       *     getState() { return { ...this._state }; }
-       *     setState(s) { this._state = { ...this._state, ...s }; }
-       *   }
-       */
-
-      class WavrPlugin {
-        // ── Static metadata — override in every subclass ─────────────
-        /** Unique snake_case identifier.  Used as the registry key. */
-        static pluginId    = "wavr-plugin";
-        /** Human-readable display name shown in the DAW topbar. */
-        static pluginName  = "WAVR Plugin";
-        /** Accent colour for the plugin chrome (CSS hex). */
-        static pluginColor = "#6c5ce7";
-        /** Default UI presentation.  "modal" | "drawer" | "inline" */
-        static pluginMode  = "modal";
-        /** Categorises the plugin in the browser UI. */
-        static pluginCategory = "utility"; // "instrument" | "effect" | "utility" | "generator"
-        /** Short description shown in the plugin browser. */
-        static pluginDescription = "";
-        /** SemVer string. */
-        static pluginVersion = "1.0.0";
-
-        /**
-         * @param {HostAPI} hostAPI  Injected by WavrPro at instantiation time.
-         * @param {object}  options  Plugin-specific config (passed through from the shell).
-         */
-        constructor(hostAPI, options = {}) {
-          if (!hostAPI) throw new Error("WavrPlugin: hostAPI is required");
-
-          // ── Host services ─────────────────────────────────────────
-          /** Full HostAPI reference. */
-          this.host    = hostAPI;
-          /** The shared AudioContext.  Do NOT close it — it belongs to the host. */
-          this.ctx     = hostAPI.audioContext;
-          /** BPM snapshot at mount time.  Updated by onBpmChange(). */
-          this.bpm     = hostAPI.bpm;
-          /** Options passed by the consuming application. */
-          this.options = options;
-
-          // ── Internal ──────────────────────────────────────────────
-          /** The DOM element this plugin is mounted into. Set by mount(). */
-          this._el        = null;
-          /** Serialisable plugin state.  Persist everything here. */
-          this._state     = {};
-          this._destroyed = false;
-        }
-
-        // ── Required — every plugin MUST implement these ─────────────
-
-        /**
-         * Build and inject the plugin UI into `el`.
-         * Called once after construction.  Always set this._el = el.
-         * @param {HTMLElement} el
-         */
-        mount(el) {
-          throw new Error(`${this.constructor.name}: mount(el) is not implemented`);
-        }
-
-        /**
-         * Tear down the plugin.
-         * Stop all audio, remove event listeners, cancel timers.
-         * Always call super.destroy() at the END of your override — it clears the DOM.
-         */
-        destroy() {
-          this._destroyed = true;
-          if (this._el) this._el.innerHTML = "";
-        }
-
-        /**
-         * Return a plain JSON-serialisable snapshot of plugin state.
-         * Called by the host when saving a session.
-         * @returns {object}
-         */
-        getState() {
-          return { ...this._state };
-        }
-
-        /**
-         * Restore state from a previously returned getState() object.
-         * Called by the host when loading a session or re-opening the plugin.
-         * @param {object} state
-         */
-        setState(state) {
-          this._state = { ...this._state, ...state };
-        }
-
-        // ── Transport hooks — override as needed ──────────────────────
-
-        /**
-         * Host calls this whenever the transport BPM changes.
-         * Call super.onBpmChange(bpm) to keep this.bpm in sync.
-         * @param {number} bpm
-         */
-        onBpmChange(bpm) {
-          this.bpm = bpm;
-        }
-
-        /**
-         * Host calls this when transport starts playing.
-         * @param {number} startBeat      Beat position playback starts at.
-         * @param {number} contextTime    audioContext.currentTime at play start.
-         */
-        onTransportStart(startBeat, contextTime) {}
-
-        /** Host calls this when transport stops. */
-        onTransportStop() {}
-
-        /**
-         * Host calls this on every rAF frame while playing.
-         * Keep implementation cheap — it runs 60×/sec.
-         * @param {number} currentBeat
-         */
-        onPlayheadTick(currentBeat) {}
-
-        // ── Helpers — use these to talk back to the host ──────────────
-
-        /**
-         * Send an AudioBuffer to the host to be placed on a new track.
-         * Equivalent to a plugin "bouncing" its output into the DAW timeline.
-         *
-         * @param {AudioBuffer} buffer    The rendered audio.
-         * @param {string}      [label]   Optional track / clip name.
-         * @throws {TypeError}  If buffer is not a valid AudioBuffer.
-         */
-        emitBuffer(buffer, label) {
-          if (!(buffer instanceof AudioBuffer))
-            throw new TypeError("emitBuffer: argument must be an AudioBuffer");
-          if (this._destroyed) return;
-          this.host.onRender(buffer, this.bpm, label || this.constructor.pluginName);
-        }
-
-        /**
-         * Tell the host that internal state has changed.
-         * Triggers a session "dirty" flag so the user is prompted to save.
-         */
-        emitStateChange() {
-          if (this._destroyed) return;
-          this.host.onStateChange(this.getState());
-        }
-
-        /**
-         * Display a toast notification in the host DAW.
-         * @param {string}  message
-         * @param {"info"|"success"|"warn"|"error"} [level="info"]
-         */
-        notify(message, level = "info") {
-          if (this._destroyed) return;
-          this.host.onNotify(message, level);
-        }
-
-        // ── Utility ───────────────────────────────────────────────────
-
-        /**
-         * Convenience: beats → seconds at current BPM.
-         * @param {number} beats
-         * @returns {number} seconds
-         */
-        b2s(beats) { return (beats / this.bpm) * 60; }
-
-        /**
-         * Convenience: seconds → beats at current BPM.
-         * @param {number} seconds
-         * @returns {number} beats
-         */
-        s2b(seconds) { return (seconds / 60) * this.bpm; }
-      }
-
-      // ── HostAPI shape (informational — not enforced at runtime) ──────
-      //
-      // The object WavrPro constructs and passes to each plugin:
-      //
-      // interface HostAPI {
-      //   readonly audioContext : AudioContext
-      //   readonly bpm          : number
-      //
-      //   onRender(buffer: AudioBuffer, bpm: number, label?: string): void
-      //     Drop a rendered AudioBuffer onto a new DAW track.
-      //
-      //   onStateChange(state: object): void
-      //     Notify the host that plugin state changed.
-      //
-      //   onNotify(message: string, level: "info"|"success"|"warn"|"error"): void
-      //     Show a toast in the DAW UI.
-      //
-      //   addTrack(name: string, color?: string): Track
-      //     Create an empty track and return it.
-      //
-      //   getPlayhead(): { beat: number, isPlaying: boolean, contextTime: number }
-      //     Read the current transport position.
-      //
-      //   getTracks(): TrackSummary[]
-      //     Read-only snapshot of all current tracks.
-      // }
-
-      if (typeof module !== "undefined" && module.exports) {
-        module.exports = WavrPlugin;
-      } else if (typeof window !== "undefined") {
-        window.WavrPlugin = WavrPlugin;
-      }
-
-
       /**
        * DrumMachine.js — VST-style drum sequencer plugin
        * Pure vanilla JS class. Zero dependencies. Zero framework lock-in.
@@ -612,16 +429,7 @@ dm.<span class="tok-fn2">mount</span>(
        *   dm.onPatternChange  — callback(pattern) called on any step/param change
        */
 
-      class DrumMachine extends WavrPlugin {
-        // ── Plugin metadata ──────────────────────────────────────────
-        static pluginId          = "drum-machine";
-        static pluginName        = "Drum Machine";
-        static pluginColor       = "#ff6b35";
-        static pluginMode        = "modal";
-        static pluginCategory    = "instrument";
-        static pluginDescription = "16/32-step drum sequencer with 8 synthesized instruments, swing, velocity, and presets.";
-        static pluginVersion     = "2.0.0";
-
+      class DrumMachine {
         // ── Default instruments ─────────────────────────────────────
         static INSTRUMENTS = [
           {
@@ -770,26 +578,8 @@ dm.<span class="tok-fn2">mount</span>(
           },
         ];
 
-        constructor(hostAPIOrLegacy, optionsOrUndefined = {}) {
-          // Support plugin-framework call: new DrumMachine(hostAPI, options)
-          // AND legacy standalone call:    new DrumMachine({ audioContext, bpm, steps })
-          const isLegacy = !hostAPIOrLegacy || !hostAPIOrLegacy.onRender;
-          const legacyCtx  = isLegacy ? (hostAPIOrLegacy?.audioContext || new (window.AudioContext || window.webkitAudioContext)()) : null;
-          const resolvedHostAPI = isLegacy ? {
-            audioContext:  legacyCtx,
-            bpm:           hostAPIOrLegacy?.bpm || 120,
-            onRender:      () => {},
-            onStateChange: () => {},
-            onNotify:      (msg) => console.log("[DrumMachine]", msg),
-            addTrack:      () => ({ id: null, clips: [] }),
-            getPlayhead:   () => ({ beat: 0, isPlaying: false, contextTime: 0 }),
-            getTracks:     () => [],
-          } : hostAPIOrLegacy;
-          const options = isLegacy ? (hostAPIOrLegacy || {}) : (optionsOrUndefined || {});
-          super(resolvedHostAPI, options);
-          const bpm      = resolvedHostAPI.bpm || 120;
-          const steps    = options.steps    || (isLegacy && hostAPIOrLegacy?.steps)    || 16;
-          const container= options.container|| (isLegacy && hostAPIOrLegacy?.container)|| null;
+        constructor({ audioContext, bpm = 120, steps = 16, container = null } = {}) {
+          this._ctx    = audioContext || new (window.AudioContext || window.webkitAudioContext)();
           this._bpm    = bpm;
           this._steps  = steps;       // 16 or 32
           this._swing  = 0;           // 0–100
@@ -803,14 +593,14 @@ dm.<span class="tok-fn2">mount</span>(
           this._el = null;
 
           // Master gain
-          this._masterGain = this.ctx.createGain();
+          this._masterGain = this._ctx.createGain();
           this._masterGain.gain.value = this._masterVol;
-          this._masterGain.connect(this.ctx.destination);
+          this._masterGain.connect(this._ctx.destination);
 
           // Per-instrument gains routed through master
           this._instrGains = {};
           DrumMachine.INSTRUMENTS.forEach(inst => {
-            const g = this.ctx.createGain();
+            const g = this._ctx.createGain();
             g.gain.value = 1;
             g.connect(this._masterGain);
             this._instrGains[inst.id] = g;
@@ -839,8 +629,10 @@ dm.<span class="tok-fn2">mount</span>(
 
         destroy() {
           this.stop();
+          if (this._el) this._el.innerHTML = "";
           this._masterGain.disconnect();
-          super.destroy();  // clears this._el.innerHTML
+          const styleEl = document.getElementById("dm-styles");
+          if (styleEl) styleEl.remove();
         }
 
         setBpm(bpm) {
@@ -851,10 +643,10 @@ dm.<span class="tok-fn2">mount</span>(
 
         start() {
           if (this._running) return;
-          if (this.ctx.state === "suspended") this.ctx.resume();
+          if (this._ctx.state === "suspended") this._ctx.resume();
           this._running = true;
           this._currentStep = 0;
-          this._nextStepTime = this.ctx.currentTime + 0.05;
+          this._nextStepTime = this._ctx.currentTime + 0.05;
           this._scheduler();
           this._el?.querySelector(".dm-play-btn")?.classList.add("dm-active");
         }
@@ -906,7 +698,7 @@ dm.<span class="tok-fn2">mount</span>(
         async renderToBuffer() {
           const stepSec  = this._stepDuration();
           const totalSec = stepSec * this._steps;
-          const sr       = this.ctx.sampleRate;
+          const sr       = this._ctx.sampleRate;
           const offCtx   = new OfflineAudioContext(2, Math.ceil(sr * totalSec), sr);
 
           // re-route through offline master gain
@@ -947,8 +739,6 @@ dm.<span class="tok-fn2">mount</span>(
           });
 
           const buf = await offCtx.startRendering();
-          this.emitBuffer(buf, this.constructor.pluginName);
-          // Legacy callback
           if (typeof this.onRender === "function") this.onRender(buf, this._bpm);
           return buf;
         }
@@ -970,7 +760,7 @@ dm.<span class="tok-fn2">mount</span>(
         _scheduler() {
           if (!this._running) return;
           const stepSec = this._stepDuration();
-          while (this._nextStepTime < this.ctx.currentTime + this._scheduleAheadTime) {
+          while (this._nextStepTime < this._ctx.currentTime + this._scheduleAheadTime) {
             this._scheduleStep(this._currentStep, this._nextStepTime);
             this._advanceStep(stepSec);
           }
@@ -995,7 +785,7 @@ dm.<span class="tok-fn2">mount</span>(
           });
 
           // visual tick — fire slightly before the beat so UI feels tight
-          const delay = (when - this.ctx.currentTime) * 1000;
+          const delay = (when - this._ctx.currentTime) * 1000;
           setTimeout(() => {
             this._updateStepHighlight(step);
             if (typeof this.onStepTick === "function") this.onStepTick(step);
@@ -1019,22 +809,6 @@ dm.<span class="tok-fn2">mount</span>(
           this._el.querySelectorAll(".dm-step-num").forEach(el => {
             el.classList.toggle("dm-step-num-active", parseInt(el.dataset.step, 10) === activeStep);
           });
-        }
-
-        // ── WavrPlugin interface overrides ──────────────────────────
-
-        /** Returns pattern state — used by session save. */
-        getState() { return this.getPattern(); }
-
-        /** Restores pattern state — used by session load and re-open. */
-        setState(state) { this.loadPattern(state); }
-
-        /** Called by host when BPM changes in the DAW transport. */
-        onBpmChange(bpm) {
-          super.onBpmChange(bpm);
-          this._bpm = bpm;
-          const inp = this._el?.querySelector(".dm-bpm-input");
-          if (inp) inp.value = bpm;
         }
 
         // ── Internal: default pattern ────────────────────────────────
@@ -1265,9 +1039,9 @@ dm.<span class="tok-fn2">mount</span>(
             btn.disabled = true;
             try {
               await this.renderToBuffer();
-              this.notify("Bounced!", "success");
+              this._setStatus("Bounced! Check your DAW track.");
             } catch (e) {
-              this.notify("Render failed: " + e.message, "error");
+              this._setStatus("Render failed: " + e.message);
             }
             btn.textContent = "↓ Bounce";
             btn.disabled = false;
@@ -1297,7 +1071,7 @@ dm.<span class="tok-fn2">mount</span>(
             btn.style.cssText = "";
           }
           // preview sound on activate
-          if (cell.active && this.ctx.state !== "suspended") {
+          if (cell.active && this._ctx.state !== "suspended") {
             const ig = this._instrGains[instr];
             const patchedCtx = new Proxy(this._ctx, {
               get(target, key) {
@@ -1306,7 +1080,7 @@ dm.<span class="tok-fn2">mount</span>(
                 return typeof v === "function" ? v.bind(target) : v;
               }
             });
-            inst.synth(patchedCtx, this.ctx.currentTime + 0.01, cell.velocity);
+            inst.synth(patchedCtx, this._ctx.currentTime + 0.01, cell.velocity);
           }
           this._notify();
         }
@@ -1350,18 +1124,12 @@ dm.<span class="tok-fn2">mount</span>(
         }
 
         _notify() {
-          // Framework: tell host state changed (saves with session)
-          this.emitStateChange();
-          // Legacy callback support
           if (typeof this.onPatternChange === "function") {
             this.onPatternChange(this.getPattern());
           }
         }
 
         _setStatus(msg) {
-          // Legacy method — calls this.notify() which routes to host DAW or console
-          this.notify(msg, "info");
-          // Also update in-plugin status bar if present
           const el = this._el?.querySelector("#dm-status");
           if (el) { el.textContent = msg; setTimeout(() => { if (el) el.textContent = ""; }, 3000); }
         }
@@ -1447,7 +1215,7 @@ dm.<span class="tok-fn2">mount</span>(
           this._el.innerHTML = this._buildHTML();
           this._bindEvents();
           if (wasRunning) this.start();
-          this.notify(`Loaded: ${name}`, "info");
+          this._setStatus(`Loaded: ${name}`);
           this._notify();
         }
 
@@ -1650,8 +1418,7 @@ dm.<span class="tok-fn2">mount</span>(
         }
       }
 
-      // ── Export ───────────────────────────────────────────────────
-      // Requires WavrPlugin to be defined (window.WavrPlugin or imported).
+      // ── CommonJS + ESM dual export ────────────────────────────────
       if (typeof module !== "undefined" && module.exports) {
         module.exports = DrumMachine;
       } else if (typeof window !== "undefined") {
@@ -1659,155 +1426,315 @@ dm.<span class="tok-fn2">mount</span>(
       }
 
 
-      // ── Demo harness ──────────────────────────────────────────────
+      // ─── Test Harness ─────────────────────────────────────────────
       (function() {
-        const logList    = document.getElementById('log-list');
-        const bounceList = document.getElementById('bounce-list');
-        const statusEl   = document.getElementById('plugin-status');
-        let bounceCount  = 0;
-        let previewCtx   = null;
-        let previewSrc   = null;
+        let dm        = null;
+        let dmModal   = null;
+        let dmDrawer  = null;
+        let bounceCount = 0;
+        let patternCache = null;
 
-        function ts() {
-          const n = new Date();
-          return n.getHours().toString().padStart(2,'0')+':'+
-                 n.getMinutes().toString().padStart(2,'0')+':'+
-                 n.getSeconds().toString().padStart(2,'0');
+        const logEl      = document.getElementById('log');
+        const statStep   = document.getElementById('stat-step');
+        const statBpm    = document.getElementById('stat-bpm');
+        const statActive = document.getElementById('stat-active');
+        const statBufs   = document.getElementById('stat-buffers');
+        const patJson    = document.getElementById('pattern-json');
+        const dlQueue    = document.getElementById('download-queue');
+
+        function addLog(msg, type) {
+          type = type || '';
+          var now = new Date();
+          var ts = now.getHours().toString().padStart(2,'0') + ':' +
+                   now.getMinutes().toString().padStart(2,'0') + ':' +
+                   now.getSeconds().toString().padStart(2,'0') + '.' +
+                   now.getMilliseconds().toString().padStart(3,'0');
+          var d = document.createElement('div');
+          d.className = 'log-entry' + (type ? ' ' + type : '');
+          d.innerHTML = '<span class="log-time">' + ts + '</span>' + msg;
+          logEl.insertBefore(d, logEl.firstChild);
+          if (logEl.children.length > 120) logEl.removeChild(logEl.lastChild);
         }
 
-        function log(msg, type) {
-          type = type || '';
-          const d = document.createElement('div');
-          d.className = 'log-entry';
-          d.innerHTML = '<span class="log-ts">'+ts()+'</span><span class="log-msg '+type+'">'+msg+'</span>';
-          logList.insertBefore(d, logList.firstChild);
-          if (logList.children.length > 80) logList.removeChild(logList.lastChild);
+        function countActiveSteps(pattern) {
+          if (!pattern) return 0;
+          var total = 0;
+          Object.values(pattern).forEach(function(row) {
+            if (Array.isArray(row)) row.forEach(function(cell) { if (cell && cell.active) total++; });
+          });
+          return total;
+        }
+
+        function updatePatternDisplay(state) {
+          patternCache = state;
+          statBpm.textContent = state.bpm || '—';
+          statActive.textContent = countActiveSteps(state.pattern);
+          var compact = {};
+          Object.entries(state.pattern || {}).forEach(function(entry) {
+            var id = entry[0], row = entry[1];
+            var actives = row.map(function(c, i) { return c.active ? i + 1 : null; }).filter(Boolean);
+            if (actives.length) compact[id] = actives;
+          });
+          patJson.textContent = JSON.stringify({ bpm: state.bpm, swing: state.swing, steps: state.steps, active: compact }, null, 2);
         }
 
         function encodeWAV(ab) {
-          const nc=ab.numberOfChannels,SR=ab.sampleRate,nf=ab.length;
-          const ba=nc*2,br=SR*ba,ds=nf*ba;
-          const buf=new ArrayBuffer(44+ds);const v=new DataView(buf);
-          function ws(o,s){for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i));}
+          var nc=ab.numberOfChannels, SR=ab.sampleRate, nf=ab.length;
+          var ba=nc*2, br=SR*ba, ds=nf*ba;
+          var buf=new ArrayBuffer(44+ds); var v=new DataView(buf);
+          function ws(o,s){for(var i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i));}
           ws(0,'RIFF');v.setUint32(4,36+ds,true);ws(8,'WAVE');ws(12,'fmt ');
           v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,nc,true);
           v.setUint32(24,SR,true);v.setUint32(28,br,true);v.setUint16(32,ba,true);
           v.setUint16(34,16,true);ws(36,'data');v.setUint32(40,ds,true);
-          let off=44;const ch=[];for(let c=0;c<nc;c++)ch.push(ab.getChannelData(c));
-          for(let i=0;i<nf;i++)for(let c=0;c<nc;c++){
-            const s=Math.max(-1,Math.min(1,ch[c][i]));
-            v.setInt16(off,s<0?s*0x8000:s*0x7fff,true);off+=2;
+          var off=44; var ch=[];
+          for(var c=0;c<nc;c++) ch.push(ab.getChannelData(c));
+          for(var i=0;i<nf;i++) for(var c=0;c<nc;c++){
+            var s=Math.max(-1,Math.min(1,ch[c][i]));
+            v.setInt16(off, s<0?s*0x8000:s*0x7fff, true); off+=2;
           }
           return buf;
         }
 
-        function addBounce(buf, bpm) {
+        function addBounceToQueue(buf, bpm, label) {
           bounceCount++;
-          statusEl.textContent = 'Bounced #' + bounceCount;
-          setTimeout(() => { statusEl.textContent = 'Running'; }, 2000);
+          statBufs.textContent = bounceCount;
+          addLog('Bounced: ' + label + ' — ' + buf.duration.toFixed(2) + 's @ ' + bpm + ' BPM, ' + buf.numberOfChannels + 'ch', 'bounce');
 
-          const empty = bounceList.querySelector('.bounce-empty');
+          var empty = dlQueue.querySelector('.dl-empty');
           if (empty) empty.remove();
 
-          const dur = buf.duration.toFixed(2);
-          const label = bpm + ' BPM · ' + dur + 's · #' + bounceCount;
+          var item = document.createElement('div');
+          item.className = 'dl-item';
 
-          const item = document.createElement('div');
-          item.className = 'bounce-item';
-
-          const nameEl = document.createElement('span');
-          nameEl.className = 'bounce-name';
+          var nameEl = document.createElement('span');
+          nameEl.className = 'dl-name';
           nameEl.textContent = label;
+          item.appendChild(nameEl);
 
-          const durEl = document.createElement('span');
-          durEl.className = 'bounce-dur';
-          durEl.textContent = dur+'s';
-
-          const playBtn = document.createElement('button');
-          playBtn.className = 'bi-btn bi-play';
+          var playBtn = document.createElement('button');
+          playBtn.className = 'dl-btn';
           playBtn.textContent = '▶';
+          playBtn.title = 'Preview';
+          var previewCtx = null;
+          var previewSrc = null;
           playBtn.addEventListener('click', function() {
             if (previewSrc) {
               try { previewSrc.stop(); } catch(e) {}
-              if (previewCtx) { previewCtx.close(); previewCtx = null; }
-              previewSrc = null;
-              document.querySelectorAll('.bi-play.active').forEach(b => b.classList.remove('active'));
-              if (playBtn.classList.contains('active')) { return; }
+              if (previewCtx) previewCtx.close();
+              previewSrc = null; previewCtx = null;
+              playBtn.textContent = '▶'; playBtn.style.color = '';
+              return;
             }
             previewCtx = new (window.AudioContext || window.webkitAudioContext)();
-            previewCtx.resume().then(() => {
+            previewCtx.resume().then(function() {
               previewSrc = previewCtx.createBufferSource();
-              previewSrc.buffer = buf; previewSrc.loop = true;
-              previewSrc.connect(previewCtx.destination); previewSrc.start();
-              playBtn.classList.add('active'); playBtn.textContent = '■';
-              previewSrc.onended = () => { playBtn.classList.remove('active'); playBtn.textContent = '▶'; };
+              previewSrc.buffer = buf;
+              previewSrc.loop = true;
+              previewSrc.connect(previewCtx.destination);
+              previewSrc.start();
+              playBtn.textContent = '■'; playBtn.style.color = '#e84040';
+              previewSrc.onended = function() { playBtn.textContent = '▶'; playBtn.style.color = ''; previewSrc = null; };
             });
           });
 
-          const dlBtn = document.createElement('button');
-          dlBtn.className = 'bi-btn bi-dl';
+          var dlBtn = document.createElement('button');
+          dlBtn.className = 'dl-btn';
           dlBtn.textContent = '↓';
-          dlBtn.addEventListener('click', () => {
-            const wav = encodeWAV(buf);
-            const blob = new Blob([wav], { type:'audio/wav' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.href=url; a.download='drum-loop-'+bounceCount+'.wav'; a.click();
-            setTimeout(() => URL.revokeObjectURL(url), 8000);
-            log('Downloaded drum-loop-'+bounceCount+'.wav', 'action');
+          dlBtn.title = 'Download WAV';
+          dlBtn.addEventListener('click', function() {
+            var wav = encodeWAV(buf);
+            var blob = new Blob([wav], { type: 'audio/wav' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = label.replace(/\s+/g,'-') + '.wav'; a.click();
+            setTimeout(function() { URL.revokeObjectURL(url); }, 8000);
+            addLog('Downloaded: ' + label + '.wav', 'action');
           });
 
-          item.appendChild(nameEl); item.appendChild(durEl); item.appendChild(playBtn); item.appendChild(dlBtn);
-          bounceList.insertBefore(item, bounceList.firstChild);
-          while (bounceList.children.length > 6) bounceList.removeChild(bounceList.lastChild);
-
-          // Switch to bounces tab
-          document.querySelector('[data-tab="bounces"]').click();
+          item.appendChild(playBtn);
+          item.appendChild(dlBtn);
+          dlQueue.insertBefore(item, dlQueue.firstChild);
+          while (dlQueue.children.length > 8) dlQueue.removeChild(dlQueue.lastChild);
         }
 
-        // Build minimal hostAPI for standalone demo
-        const mockHostAPI = {
-          get audioContext() {
-            if (!window._demoCtx) window._demoCtx = new (window.AudioContext || window.webkitAudioContext)();
-            return window._demoCtx;
-          },
-          get bpm() { return 120; },
-          onRender(buf, bpm, label) { addBounce(buf, bpm); log('Bounce: '+label+' — '+buf.duration.toFixed(2)+'s @ '+bpm+' BPM', 'bounce'); },
-          onStateChange(state) { log('State updated — pattern saved', 'event'); },
-          onNotify(msg, level) {
-            log(msg, level==='error'?'error':level==='success'?'bounce':'event');
-            statusEl.textContent = msg;
-            setTimeout(() => statusEl.textContent = 'Running', 2000);
-          },
-          addTrack(name) { log('Track created: '+name, 'action'); return { id:'demo', clips:[] }; },
-          getPlayhead() { return { beat:0, isPlaying:false, contextTime:0 }; },
-          getTracks() { return []; },
-        };
+        function makeCallbacks(instanceLabel) {
+          return {
+            onStepTick: function(step) { statStep.textContent = step + 1; },
+            onPatternChange: function(state) {
+              updatePatternDisplay(state);
+              addLog('Pattern changed — ' + countActiveSteps(state.pattern) + ' active steps', 'event');
+            },
+            onRender: function(buf, bpm) {
+              var label = instanceLabel + ' — ' + bpm + 'bpm #' + (bounceCount + 1);
+              addBounceToQueue(buf, bpm, label);
+            },
+          };
+        }
 
-        // Mount the plugin
-        const dm = new DrumMachine(mockHostAPI, {});
-        dm.onPatternChange = (pattern) => {
-          const active = Object.values(pattern.pattern).reduce((n,row) => n + row.filter(c=>c.active).length, 0);
-          log('Pattern: '+active+' steps active @ '+pattern.bpm+' BPM', 'event');
-        };
-        dm.onStepTick = (step) => {
-          if (step === 0) statusEl.textContent = 'Playing ▶ bar';
-        };
+        function getMode() { return document.getElementById('mode-select').value; }
 
-        const mount = document.getElementById('plugin-mount');
-        dm.mount(mount);
+        function mountInline() {
+          var mount = document.getElementById('plugin-mount');
+          if (dm) { dm.destroy(); dm = null; }
+          var ctx = new (window.AudioContext || window.webkitAudioContext)();
+          dm = new DrumMachine({ audioContext: ctx, bpm: parseInt(document.getElementById('host-bpm').value) || 120 });
+          var cb = makeCallbacks('Inline');
+          dm.onStepTick      = cb.onStepTick;
+          dm.onPatternChange = cb.onPatternChange;
+          dm.onRender        = cb.onRender;
+          if (patternCache) dm.loadPattern(patternCache);
+          dm.mount(mount);
+          addLog('Inline instance mounted', 'action');
+          updatePatternDisplay(dm.getPattern());
+        }
 
-        log('DrumMachine v2.0 loaded', 'event');
-        log('8 instruments · 16 steps · 120 BPM', 'event');
+        function mountModal() {
+          var mount = document.getElementById('modal-mount');
+          if (dmModal) { dmModal.destroy(); dmModal = null; }
+          var ctx = new (window.AudioContext || window.webkitAudioContext)();
+          dmModal = new DrumMachine({ audioContext: ctx, bpm: parseInt(document.getElementById('host-bpm').value) || 120 });
+          var cb = makeCallbacks('Modal');
+          dmModal.onStepTick      = cb.onStepTick;
+          dmModal.onPatternChange = cb.onPatternChange;
+          dmModal.onRender        = cb.onRender;
+          if (patternCache) dmModal.loadPattern(patternCache);
+          dmModal.mount(mount);
+          document.getElementById('modal-overlay').classList.add('open');
+          addLog('Modal instance opened', 'action');
+          updatePatternDisplay(dmModal.getPattern());
+        }
 
-        // Tabs
-        document.querySelectorAll('.sb-tab').forEach(tab => {
-          tab.addEventListener('click', () => {
-            document.querySelectorAll('.sb-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.sb-pane').forEach(p => p.classList.remove('active'));
-            tab.classList.add('active');
-            document.getElementById('pane-'+tab.dataset.tab).classList.add('active');
-          });
+        function mountDrawer() {
+          var mount = document.getElementById('drawer-mount');
+          if (dmDrawer) { dmDrawer.destroy(); dmDrawer = null; }
+          var ctx = new (window.AudioContext || window.webkitAudioContext)();
+          dmDrawer = new DrumMachine({ audioContext: ctx, bpm: parseInt(document.getElementById('host-bpm').value) || 120 });
+          var cb = makeCallbacks('Drawer');
+          dmDrawer.onStepTick      = cb.onStepTick;
+          dmDrawer.onPatternChange = cb.onPatternChange;
+          dmDrawer.onRender        = cb.onRender;
+          if (patternCache) dmDrawer.loadPattern(patternCache);
+          dmDrawer.mount(mount);
+          document.getElementById('drawer-overlay').classList.add('open');
+          addLog('Drawer instance opened', 'action');
+          updatePatternDisplay(dmDrawer.getPattern());
+        }
+
+        function closeModal() {
+          document.getElementById('modal-overlay').classList.remove('open');
+          if (dmModal) {
+            dmModal.stop();
+            patternCache = dmModal.getPattern();
+            dmModal.destroy(); dmModal = null;
+            addLog('Modal closed, pattern cached', 'event');
+          }
+        }
+
+        function closeDrawer() {
+          document.getElementById('drawer-overlay').classList.remove('open');
+          if (dmDrawer) {
+            dmDrawer.stop();
+            patternCache = dmDrawer.getPattern();
+            dmDrawer.destroy(); dmDrawer = null;
+            addLog('Drawer closed, pattern cached', 'event');
+          }
+        }
+
+        function applyMode(mode) {
+          var inlineArea  = document.getElementById('plugin-area');
+          var btnModal    = document.getElementById('btn-open-modal');
+          var btnDrawer   = document.getElementById('btn-open-drawer');
+          var pluginMount = document.getElementById('plugin-mount');
+
+          if (dm && mode !== 'inline') { dm.stop(); dm.destroy(); dm = null; }
+          if (dmModal)  closeModal();
+          if (dmDrawer) closeDrawer();
+
+          if (mode === 'inline') {
+            inlineArea.style.display  = 'flex';
+            btnModal.style.display    = 'none';
+            btnDrawer.style.display   = 'none';
+            mountInline();
+          } else if (mode === 'modal') {
+            inlineArea.style.display  = 'none';
+            btnModal.style.display    = 'flex';
+            btnDrawer.style.display   = 'none';
+            pluginMount.innerHTML     = '';
+          } else if (mode === 'drawer') {
+            inlineArea.style.display  = 'none';
+            btnModal.style.display    = 'none';
+            btnDrawer.style.display   = 'flex';
+            pluginMount.innerHTML     = '';
+          }
+        }
+
+        document.getElementById('mode-select').addEventListener('change', function(e) { applyMode(e.target.value); });
+        document.getElementById('btn-open-modal').addEventListener('click', mountModal);
+        document.getElementById('btn-open-drawer').addEventListener('click', mountDrawer);
+        document.getElementById('modal-close').addEventListener('click', closeModal);
+        document.getElementById('drawer-close').addEventListener('click', closeDrawer);
+
+        document.getElementById('modal-overlay').addEventListener('mousedown', function(e) {
+          if (e.target === document.getElementById('modal-overlay')) closeModal();
         });
+        document.getElementById('drawer-overlay').addEventListener('mousedown', function(e) {
+          if (e.target === document.getElementById('drawer-overlay')) closeDrawer();
+        });
+
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape') { closeModal(); closeDrawer(); }
+        });
+
+        document.getElementById('btn-sync-bpm').addEventListener('click', function() {
+          var bpm = parseInt(document.getElementById('host-bpm').value) || 120;
+          [dm, dmModal, dmDrawer].forEach(function(inst) { if (inst) inst.setBpm(bpm); });
+          addLog('Host BPM synced to ' + bpm, 'action');
+          statBpm.textContent = bpm;
+        });
+
+        document.getElementById('btn-save-pattern').addEventListener('click', function() {
+          var active = dm || dmModal || dmDrawer;
+          if (!active) { addLog('No active instance to save', 'error'); return; }
+          var state = active.getPattern();
+          var json  = JSON.stringify(state, null, 2);
+          var blob  = new Blob([json], { type: 'application/json' });
+          var url   = URL.createObjectURL(blob);
+          var a     = document.createElement('a');
+          a.href = url; a.download = 'pattern.dmpattern'; a.click();
+          setTimeout(function() { URL.revokeObjectURL(url); }, 5000);
+          addLog('Pattern saved to file', 'action');
+        });
+
+        document.getElementById('btn-load-pattern').addEventListener('click', function() {
+          document.getElementById('load-input').click();
+        });
+        document.getElementById('load-input').addEventListener('change', function(e) {
+          var file = e.target.files[0]; if (!file) return;
+          var reader = new FileReader();
+          reader.onload = function(ev) {
+            try {
+              var state = JSON.parse(ev.target.result);
+              patternCache = state;
+              var active = dm || dmModal || dmDrawer;
+              if (active) { active.loadPattern(state); updatePatternDisplay(state); addLog('Pattern loaded from ' + file.name, 'action'); }
+              else addLog('Pattern cached — open plugin to apply', 'event');
+            } catch(err) { addLog('Failed to parse pattern file: ' + err.message, 'error'); }
+          };
+          reader.readAsText(file);
+          e.target.value = '';
+        });
+
+        document.getElementById('btn-bounce-test').addEventListener('click', function() {
+          var active = dm || dmModal || dmDrawer;
+          if (!active) { addLog('No active instance — open plugin first', 'error'); return; }
+          addLog('Bounce test started…', 'action');
+          active.renderToBuffer().catch(function(e) { addLog('Bounce failed: ' + e.message, 'error'); });
+        });
+
+        addLog('Test harness ready', 'event');
+        addLog('DrumMachine loaded — ' + DrumMachine.INSTRUMENTS.length + ' instruments', 'event');
+        applyMode('inline');
 
       })();
     </script>
